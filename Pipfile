@@ -1,0 +1,34 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+opencv-python = "*"
+numpy = "*"
+imageio = "*"
+future = "*"
+termcolor = "*"
+moderngl = "5.6.4"
+Cython = "*"
+nptyping = "*" 
+scipy = "*"
+click-completion = "*"
+matplotlib = "*"
+# open3d = "*"
+
+# imageio-ffmpeg = "*"
+# scikit-learn = "*"
+# scikit-image = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
+
+[scripts]
+setup = "./scripts/setup.py"
+tests = "./scripts/run_tests.sh"
+update-image= "./scripts/update_base_image.sh"
+update-repos= "git submodule update --recursive --remote"
+reset-repos= "git submodule update"

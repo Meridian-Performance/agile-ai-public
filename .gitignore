@@ -1,0 +1,11 @@
+*.cpp
+__pycache__
+.idea
+.venv
+*.so
+build
+*.cpp
+
+# Libraries
+libraries/*
+pyne_tests.log
