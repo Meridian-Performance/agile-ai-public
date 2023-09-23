@@ -61,6 +61,10 @@ def true_by_predicate(predicate):
     return TrueByPredicate(predicate)
 
 
+def an_existing_path():
+    return TrueByPredicate(lambda path: path.exists)
+
+
 class FalseByPredicate(Matcher):
     def __init__(self, *params):
         super().__init__("false_by_predicate", self.violates_predicate_comparator, *params)

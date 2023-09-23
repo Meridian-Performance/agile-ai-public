@@ -106,18 +106,15 @@ def function_that_returns_values(values: Iterable):
 
 class TCBase:
     stubs: MegaStub
+    test_directory: DirectoryPath
 
-    @property
-    def test_directory(self) -> DirectoryPath:
-        pass
+    @classmethod
+    def set_test_directory(cls, test_directory: DirectoryPath):
+        cls.test_directory = test_directory
 
     @classmethod
     def initialize_services(cls):
         autowire_services(cls)
-
-    @property
-    def test_directory(self) -> DirectoryPath:
-        return self.test_directory_service.test_directory
 
     def __init__(self):
         self.initialize_services()
