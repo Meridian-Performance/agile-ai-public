@@ -1,3 +1,4 @@
 
 class FilePath:
-    pass
+    def __init__(self, path):
+        pass
