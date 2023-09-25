@@ -48,9 +48,15 @@ class MeshBuilder(Mesh):
 
     def build(self):
         """Create the mesh."""
-        vertices = np.array(self._v_list, dtype=np.float32).T
-        faces = np.array(self._f_list, dtype=np.uint32).T
-        Mesh.__init__(self, vertices, faces)
+        vertices = np.array(self._v_list, dtype=np.float32)
+        faces = np.array(self._f_list, dtype=np.uint32)
+        Mesh.__init__(self,
+                      vertices,
+                      faces,
+                      mesh_names=["mesh"],
+                      mesh_vertex_slice_indices=np.array([0, len(vertices)]),
+                      mesh_face_slice_indices=np.array([0, len(faces)])
+                      )
         del self._f_list
         del self._v_list
         del self._i_of_v

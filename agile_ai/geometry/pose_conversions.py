@@ -4,7 +4,7 @@ from typing import Union
 
 import numpy as np
 
-from avvir_dataflow.utils.numeric_types import Float44, Float4, Float33
+from agile_ai.data_marshalling.numeric_types import Float44, Float33, Float4
 
 FrameTuple = namedtuple("FrameTuple", "R t")
 

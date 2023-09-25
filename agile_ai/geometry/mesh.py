@@ -117,7 +117,23 @@ class Mesh(MeshTransforms):
 
     @staticmethod
     def from_mesh_list(mesh_list, merge_meshes=True):
-        pass
+        mesh_names = []
+        vertex_counts = np.append(0, np.array([len(m.vertices) for m in mesh_list]))
+        face_counts = np.append(0, np.array([len(m.faces) for m in mesh_list]))
+        mesh_face_slice_indices = face_counts.cumsum()
+        mesh_vertex_slice_indices = vertex_counts.cumsum()
+        all_vertices = np.vstack([m.vertices for m in mesh_list])
+        all_faces = np.vstack([m.faces for m in mesh_list])
+        for index, mesh in enumerate(mesh_list):
+            assert len(mesh.mesh_names) == 1
+            mesh_names.append(mesh.mesh_names[0])
+            face_slice = slice(*mesh_face_slice_indices[index:index+2])
+            all_faces[face_slice] += mesh_vertex_slice_indices[index]
+        return Mesh(vertices=all_vertices,
+                    faces=all_faces,
+                    mesh_names=mesh_names,
+                    mesh_face_slice_indices=mesh_face_slice_indices,
+                    mesh_vertex_slice_indices=mesh_vertex_slice_indices)
 
     def __init__(self, vertices, faces,
                  mesh_names=None,
@@ -208,7 +224,7 @@ class Mesh(MeshTransforms):
 
     def set_name(self, name: str):
         self.mesh_names = [name]
-        self.mesh_face_slice_indices = np.array([0, len(self.Fi)], dtype=np.uint64)
+        self.mesh_face_slice_indices = np.array([0, len(self.faces)], dtype=np.uint64)
 
     def with_name(self, name: str):
         self.set_name(name)
