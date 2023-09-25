@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from agile_ai.data_marshalling.file_handler import FileHandler
 from agile_ai.data_marshalling.obj_handler import ObjHandler
 from agile_ai.geometry.mesh import Mesh
 from agile_ai.geometry.shapes.cube import Cube
@@ -105,3 +106,13 @@ def obj_handler_test():
                 mesh = ObjHandler.load(tc.file_path)
                 expect(mesh.vertices).to_be(exactly_equal_to_array(tc.mesh.vertices))
                 expect(mesh.faces).to_be(exactly_equal_to_array(tc.mesh.faces))
+    
+    @describe("#matches")
+    def _():
+        @it("matches only .obj extensions")
+        def _(tc: TestContext):
+            expect(ObjHandler.matches("test.obj")).to_be(True)
+            expect(ObjHandler.matches("test.obj_")).to_be(False)
+    @it("is registered with FilePath")
+    def _(tc: TestContext):
+        expect((tc.test_directory // "test.obj")._handler).to_be(ObjHandler)

@@ -45,3 +45,13 @@ def txt_handler_test():
                 text = fh.read()
             expect(tc.txt_path).to_be(an_existing_path())
             expect(text).to_be("some text string\nsome other line\n")
+
+    @describe("#matches")
+    def _():
+        @it("matches only .obj extensions")
+        def _(tc: TestContext):
+            expect(TxtHandler.matches("test.txt")).to_be(True)
+            expect(TxtHandler.matches("test.txt_")).to_be(False)
+    @it("is registered with FilePath")
+    def _(tc: TestContext):
+        expect((tc.test_directory // "test.txt")._handler).to_be(TxtHandler)

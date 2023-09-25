@@ -20,6 +20,6 @@ class ObjHandler(FileHandler):
                 print(line, file=file)
 
     @classmethod
-    def matches(cls, filename):
+    def matches(cls, filename: str):
         """Check if filename matches."""
         return filename.endswith(".obj")

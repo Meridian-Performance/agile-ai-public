@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 opencv-python = "*"
 numpy = "*"
-imageio = "*"
 future = "*"
 termcolor = "*"
 moderngl = "5.6.4"
@@ -15,11 +14,12 @@ nptyping = "*"
 scipy = "*"
 click-completion = "*"
 matplotlib = "*"
+pyyaml = "*"
 # open3d = "*"
-
 # imageio-ffmpeg = "*"
 # scikit-learn = "*"
 # scikit-image = "*"
+imageio = {extras = ["pyav"], version = "*"}
 
 [dev-packages]
 
