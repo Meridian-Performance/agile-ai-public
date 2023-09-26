@@ -107,14 +107,6 @@ class Mesh(MeshTransforms):
     """Mesh representation."""
     mesh_names: Iterable[str]
 
-    @property
-    def face_count(self):
-        return len(self.Fi)
-
-    @property
-    def vertex_count(self):
-        return len(self.point_cloud)
-
     @staticmethod
     def from_mesh_list(mesh_list, merge_meshes=True):
         mesh_names = []
@@ -151,8 +143,12 @@ class Mesh(MeshTransforms):
         self.mesh_face_slice_indices = mesh_face_slice_indices
         self.mesh_vertex_slice_indices = mesh_vertex_slice_indices
 
-    def copy(self, dtype=None):
-        pass
+    def copy(self, vertex_dtype=None, face_dtype=None, index_dtype=None):
+        return Mesh(vertices=np.array(self.vertices, dtype=vertex_dtype),
+                    faces=np.array(self.faces, dtype=face_dtype),
+                    mesh_names=list(self.mesh_names),
+                    mesh_face_slice_indices=np.array(self.mesh_face_slice_indices, dtype=index_dtype),
+                    mesh_vertex_slice_indices=np.array(self.mesh_vertex_slice_indices, dtype=index_dtype))
 
     def __eq__(self, other):
         """Test for equivalence."""
@@ -163,8 +159,11 @@ class Mesh(MeshTransforms):
 
     @property
     def face_count(self):
-        """Return the number of faces."""
         return len(self.faces)
+
+    @property
+    def vertex_count(self):
+        return len(self.vertices)
 
     @property
     def face_normals(self):
@@ -182,13 +181,8 @@ class Mesh(MeshTransforms):
         A, B, C = self.get_triangle_vertices()
         return (A + B + C) / 3.0
 
-    @property
-    def triangles(self):
-        """Return triangles."""
-        return self.vertices[self.faces]
-
     def get_triangle_vertices(self) -> Tuple:
-        pass
+        return self.vertices[self.faces]
 
     def get_triangle_color(self):
         return None

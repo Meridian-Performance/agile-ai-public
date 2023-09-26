@@ -16,33 +16,6 @@ class Plane(MeshBuilder):
         self.add_quad_v(*Vs)
         self.build()
 
-    @staticmethod
-    def get_test_planes():
-        # Create planes in the camera coordinate system that
-        # show 4 planes in the u,v image as: 
-        # [R][B]
-        # [G][Y]
-        #
-        # Create 1x1 plane (0, 0, 1) --- (1, 1, 1)
-        plane = Plane()
-        plane.translate((1, 1, 2))
-        plane.scale(.5)
-        # plane_y (0, 0, 1) --- (1, 1, 1)
-        plane_y = plane.copy()
-        plane_y.get_triangle_colors = lambda: np.array([(255, 255, 0)] * 2, dtype=np.uint8)
-        # plane_g (-1, 0, 1) --- (0, 1, 1)
-        plane_g = plane.copy()
-        plane_g.translate((-1, 0, 0))
-        plane_g.get_triangle_colors = lambda: np.array([(0, 255, 0)] * 2, dtype=np.uint8)
-        # plane_r (-1, -1, 1) --- (0, 0, 1)
-        plane_r = plane.copy()
-        plane_r.translate((-1, -1, 0))
-        plane_r.get_triangle_colors = lambda: np.array([(255, 0, 0)] * 2, dtype=np.uint8)
-        # plane_b (0, -1, 1) --- (1, 0, 1)
-        plane_b = plane.copy()
-        plane_b.translate((0, -1, 0))
-        plane_b.get_triangle_colors = lambda: np.array([(0, 0, 255)] * 2, dtype=np.uint8)
-        return [plane_r, plane_g, plane_b, plane_y]
 
 
 class Circle(MeshBuilder):
