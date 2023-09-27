@@ -10,11 +10,14 @@ from agile_ai.geometry.shapes.cube import Cube
 from agile_ai.geometry.shapes.planar import Plane
 from agile_ai.geometry.shapes.sor import Sor, Sphere
 from agile_ai.rendering.renderer_interface import RendererInterface
-from agile_ai_tests.rendering.color_packer import ColorPacker
+from agile_ai.rendering.scene import Scene
+from agile_ai.rendering.color_packer import ColorPacker
 from pynetest.expectations import expect
+
 
 class TestContext:
     renderer: RendererInterface
+    scene: Scene
 
 
 def show_test_spheres(camera_params, F_camera_plane=None, axis=None):
@@ -182,15 +185,15 @@ def mask_erosion_match(Mexp, Mren, iterations=2):
     return exp_count, ren_count, diff_count
 
 
-def expect_depth_mask_match(self, name):
+def expect_depth_mask_match(tc: TestContext, name):
     camera_geometry, F_camera_world = test_cases[name][:2]
-    self.renderer.set_camera_geometry(*camera_geometry)
+    tc.scene.set_camera_geometry(*camera_geometry)
     if F_camera_world is None:
         F_camera_world = np.eye(4)
-    self.renderer.set_frame_camera_world(F_camera_world)
-    self.renderer.render()
+    tc.scene.set_frame_camera_world(F_camera_world)
+    tc.renderer.render()
     exp_image = get_test_case_image(name)[0]
-    ren_depth = self.renderer.get_data(color=False, depth=True).depth
+    ren_depth = tc.renderer.get_data(color=False, depth=True).depth
     Mexp = exp_image.any(2)
     Mren = (ren_depth < 1)
     exp_count, ren_count, diff_count = mask_erosion_match(Mexp, Mren)
@@ -201,15 +204,15 @@ def expect_depth_mask_match(self, name):
     expect(ren_count).to_be(exp_count)
 
 
-def expect_z_mask_match(self, name):
+def expect_z_mask_match(tc: TestContext, name):
     camera_geometry, F_camera_world = test_cases[name][:2]
-    self.renderer.set_camera_geometry(*camera_geometry)
+    tc.renderer.set_camera_geometry(*camera_geometry)
     if F_camera_world is None:
         F_camera_world = np.eye(4)
-    self.renderer.set_frame_camera_world(F_camera_world)
-    self.renderer.render()
+    tc.renderer.set_frame_camera_world(F_camera_world)
+    tc.renderer.render()
     exp_image, exp_uv, exp_xyz = get_test_case_image(name)
-    Zren = self.renderer.get_data(color=False, depth=False, xyz_world=True).xyz_world[2]
+    Zren = tc.renderer.get_data(color=False, depth=False, xyz_world=True).xyz_world[2]
     Mexp = exp_image.any(2)
     Mren = (Zren > 0)
     exp_count, ren_count, diff_count = mask_erosion_match(Mexp, Mren)
@@ -220,18 +223,18 @@ def expect_z_mask_match(self, name):
     expect(ren_count).to_be(exp_count)
 
 
-def expect_xyz_world_match(self, name):
+def expect_xyz_world_match(tc: TestContext, name):
     camera_geometry, F_camera_world = test_cases[name][:2]
-    self.renderer.set_camera_geometry(*camera_geometry)
+    tc.scene.set_camera_geometry(*camera_geometry)
     if F_camera_world is None:
         F_camera_world = np.eye(4)
     else:
         F_camera_world = F_camera_world.copy()
-    self.renderer.set_frame_camera_world(F_camera_world)
-    self.renderer.render()
+    tc.scene.set_frame_camera_world(F_camera_world)
+    tc.renderer.render()
     # TODO XYZ_exp should be XYZ_world, its currently camera
     color_exp, (U_exp, V_exp), XYZ_camera_exp, XYZ_world_exp = get_test_case_spheres_image(name, z_min=.05)
-    data = self.renderer.get_data(color=True, depth=False, xyz_world=True, xyz_camera=True)
+    data = tc.renderer.get_data(color=True, depth=False, xyz_world=True, xyz_camera=True)
     color_ren = data.color
     xyz_ren = data.xyz_world
     RGB_ren = color_ren[V_exp, U_exp]
@@ -314,15 +317,15 @@ def render_image_cv(camera_params, F_camera_world, meshes, z_min=.01):
     return color_image, uv_points, xyz_camera_points, xyz_world_points
 
 
-def expect_image_match(self, name, visibilities=None):
+def expect_image_match(tc: TestContext, name, visibilities=None):
     camera_geometry, F_camera_world = test_cases[name][:2]
-    self.renderer.set_camera_geometry(*camera_geometry)
+    tc.scene.set_camera_geometry(*camera_geometry)
     if F_camera_world is None:
         F_camera_world = np.eye(4)
-    self.renderer.scene.set_frame_camera_world(F_camera_world)
-    self.renderer.render()
+    tc.scene.set_frame_camera_world(F_camera_world)
+    tc.renderer.render()
     exp_image = get_test_case_image(name, visibilities)[0]
-    ren_image = self.renderer.get_data().color
+    ren_image = tc.renderer.get_data().color
     exp_image_code = ColorPacker.pack(exp_image.transpose((2, 0, 1)))
     ren_image_code = ColorPacker.pack(ren_image.transpose((2, 0, 1)))
     diff_count = (exp_image != ren_image).any(2).sum()
@@ -369,7 +372,8 @@ def get_test_sphere_collection() -> TestSphereCollection:
         cube.translate(v)
         cube.center = v
         name = "cube_%0.6d" % i
-        cube_list.add(name, cube)
+        cube.with_name(name)
+        cube_list.append(cube)
     return TestSphereCollection(radii=radii,
                                 heights=heights,
                                 sphere=sphere,
@@ -377,13 +381,17 @@ def get_test_sphere_collection() -> TestSphereCollection:
 
 
 # @fun_memo
-def get_test_spheres():
-    components = get_test_sphere_collection()
-    color_code = components.color_code
-    for name, mesh in components.elements.items():
-        face_color = color_code.color_of_name[name]
-        mesh.set_triangle_color(face_color)
-    return components.elements.values()
+def get_test_spheres() -> List[ColoredMesh]:
+    max_color_code = ColorPacker.pack((255, 255, 255))
+    min_color_code = ColorPacker.pack((0, 0, 255))
+    collection = get_test_sphere_collection()
+    color_codes = np.linspace(min_color_code, max_color_code, len(collection.cube_list)).astype(int)
+    colors = np.array(ColorPacker.unpack(color_codes)).T.astype(np.uint8)
+    colored_mesh_list = []
+    for mesh, color in zip(collection.cube_list, colors):
+        colored_mesh = ColoredMesh(mesh, triangle_color=color)
+        colored_mesh_list.append(colored_mesh)
+    return colored_mesh_list
 
 
 def show_test_geometry(camera_params, F_camera_geometry, axis, geometry):

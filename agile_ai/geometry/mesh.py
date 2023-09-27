@@ -150,13 +150,6 @@ class Mesh(MeshTransforms):
                     mesh_face_slice_indices=np.array(self.mesh_face_slice_indices, dtype=index_dtype),
                     mesh_vertex_slice_indices=np.array(self.mesh_vertex_slice_indices, dtype=index_dtype))
 
-    def __eq__(self, other):
-        """Test for equivalence."""
-        return False
-
-    def __add__(self, other: "Mesh"):
-        """Add two meshes together"""
-
     @property
     def face_count(self):
         return len(self.faces)

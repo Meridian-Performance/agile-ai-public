@@ -7,7 +7,7 @@ from agile_ai.rendering.scene import Scene
 from agile_ai_tests.rendering import rendering_test_helpers
 from agile_ai_tests.rendering.rendering_test_helpers import test_cases, show_test, get_test_case_image, \
     expect_image_match, get_test_planes
-from agile_ai_tests.test_helpers.pyne_test_helpers import TCBase, before_each, it, describe
+from agile_ai_tests.test_helpers.pyne_test_helpers import TCBase, before_each, it, describe, fit
 from agile_ai_tests.test_helpers.test_helpers import reset_and_configure_test
 from pynetest.expectations import expect
 from pynetest.pyne_tester import pyne
@@ -64,7 +64,7 @@ def cv_render_test():
             cy = 125
             w = 500
             h = 250
-            tc.renderer.set_camera_geometry(fx, fy, cx, cy, w, h)
+            tc.scene.set_camera_geometry(fx, fy, cx, cy, w, h)
             expect(tc.renderer.color_image.shape).to_be((h, w, 3))
 
     @describe("When a square is rendered in 2D")  # noqa
@@ -75,7 +75,7 @@ def cv_render_test():
             cx = cy = 0
             w = 500
             h = 300
-            tc.renderer.set_camera_geometry(fx, fy, cx, cy, w, h)
+            tc.scene.set_camera_geometry(fx, fy, cx, cy, w, h)
             # Create a 100x50 square at (75, 50)
             plane = Plane()
             plane.translate((1, 1, 0))

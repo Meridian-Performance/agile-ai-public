@@ -4,8 +4,8 @@ import numpy as np
 class ColorPacker:
     @staticmethod
     def pack(color):
-        r, g, b = color
-        code = r.astype(np.int32)
+        r, g, b = np.array(color, dtype=np.uint8)
+        code = r
         code = (code << 8)
         code += g
         code = (code << 8)

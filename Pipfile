@@ -20,6 +20,7 @@ pyyaml = "*"
 # scikit-learn = "*"
 # scikit-image = "*"
 imageio = {extras = ["pyav"], version = "*"}
+pyrr = "*"
 
 [dev-packages]
 

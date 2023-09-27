@@ -20,3 +20,10 @@ class ColoredMesh:
 
     def get_triangle_vertices(self):
         return self.mesh.get_triangle_vertices()
+
+    def is_one_color(self):
+        return self._triangle_color is not None
+
+    def get_triangle_color(self, dtype=np.uint8):
+        assert self.is_one_color()
+        return np.asarray(self._triangle_color, dtype=np.uint8)
