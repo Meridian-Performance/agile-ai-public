@@ -1,0 +1,22 @@
+FROM python:3.8-slim
+
+RUN apt-get update -y && apt-get install gcc binutils binutils-doc git openssh-client wget unzip npm curl -y
+RUN apt-get install libglib2.0-0 libsm6 libxext6 libxrender-dev libgl1-mesa-glx xvfb -y
+RUN pip3 install --upgrade pip
+RUN pip3 install pipenv
+RUN mkdir -p /root/.ssh/
+# COPY github_deploy_key /root/.ssh/id_rsa
+
+# RUN chmod 600 /root/.ssh/id_rsa && \
+RUN echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config && \
+    ssh-keyscan github.com >> /root/.ssh/known_hosts
+
+# RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+# RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+# RUN apt-get update && apt-get install -y google-cloud-sdk
+
+ENV PIPENV_VENV_IN_PROJECT=1
+ENV PYTHONPATH /usr/src/libraries:/usr/src/.venv/lib/python3.8/site-packages:$PYTHONPATH
+ENV PROJECT_HOME /usr/src
+ENV PATH $PATH:/usr/local/bin:/workspace
+WORKDIR $PROJECT_HOME:
