@@ -109,3 +109,12 @@ def file_path_test():
             text = TxtHandler.load(file_path.path)
             expect(file_path).to_be(an_existing_path())
             expect(text).to_be("some text string\nsome other line\n")
+
+        @describe("when the directory doesn't exist")
+        def _():
+            @it("is created")
+            def _(tc: TestContext):
+                file_path = tc.test_directory / "new_directory" // "file_with_handler.txt"
+                file_path.put("some text string\nsome other line\n")
+                expect(file_path).to_be(an_existing_path())
+

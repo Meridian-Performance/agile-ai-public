@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Set, Type
 
-from agile_ai.data_marshalling.directory_path import PathLike
+from agile_ai.data_marshalling.directory_path import PathLike, DirectoryPath
 from agile_ai.data_marshalling.file_handler import FileHandler
 
 
@@ -31,6 +31,7 @@ class FilePath(PathLike):
         return self._handler.load(self.path)
 
     def put(self, object):
+        DirectoryPath(self.path.parent).ensure_exists()
         return self._handler.save(self.path, object)
 
 def add_handlers():
