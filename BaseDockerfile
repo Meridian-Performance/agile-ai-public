@@ -2,6 +2,7 @@ FROM python:3.8-slim
 
 RUN apt-get update -y && apt-get install gcc binutils binutils-doc git openssh-client wget unzip npm curl -y
 RUN apt-get install libglib2.0-0 libsm6 libxext6 libxrender-dev libgl1-mesa-glx xvfb -y
+RUN apt-get install ffmpeg -y 
 RUN pip3 install --upgrade pip
 RUN pip3 install pipenv
 RUN mkdir -p /root/.ssh/
