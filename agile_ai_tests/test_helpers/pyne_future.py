@@ -50,19 +50,18 @@ class CloseToArrayMatcher(Matcher):
 
 
 class TrueByPredicate(Matcher):
-    def __init__(self, *params):
-        super().__init__("true_by_predicate", self.satisfies_predicate_comparator, *params)
-
-    def satisfies_predicate_comparator(self, a, predicate):
-        return predicate(a)
+    def __init__(self, *params, predicate=lambda: False, display_string="true_by_predicate"):
+        self.predicate = predicate
+        super().__init__(display_string, self.predicate, *params)
 
 
-def true_by_predicate(predicate):
-    return TrueByPredicate(predicate)
+
+def true_by_predicate(predicate, display_string):
+    return TrueByPredicate(predicate=predicate, display_string=display_string)
 
 
 def an_existing_path():
-    return TrueByPredicate(lambda path: path.exists)
+    return true_by_predicate(predicate=lambda path: path.exists(), display_string="an_existing_path")
 
 
 class FalseByPredicate(Matcher):

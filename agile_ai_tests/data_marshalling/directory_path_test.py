@@ -101,3 +101,20 @@ def directory_path_test():
             def _(tc: TestContext):
                 path = DirectoryPath(test_directory / "some_directory") // "some_sub_directory"
                 expect(path).to_be_a(FilePath)
+
+    @describe("#__eq__")
+    def _():
+        @describe("when two directory paths are equal")
+        def _():
+            @it("returns True")
+            def _(tc: TestContext):
+                path_a = DirectoryPath(test_directory / "some_directory")
+                path_b = DirectoryPath(test_directory / "some_directory")
+                expect(path_a == path_b).to_be(True)
+        @describe("when two directory paths are equal")
+        def _():
+            @it("returns true")
+            def _(tc: TestContext):
+                path_a = DirectoryPath(test_directory / "some_directory")
+                path_b = DirectoryPath(test_directory / "some_other_directory")
+                expect(path_a == path_b).to_be(False)

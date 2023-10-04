@@ -24,6 +24,7 @@ class FilePath(PathLike):
         self.path = path
 
     def touch(self):
+        DirectoryPath(self.path.parent).ensure_exists()
         with self.path.open("w"):
             pass
 
@@ -33,6 +34,11 @@ class FilePath(PathLike):
     def put(self, object):
         DirectoryPath(self.path.parent).ensure_exists()
         return self._handler.save(self.path, object)
+
+    def __eq__(self, other):
+        if not isinstance(other, FilePath):
+            return False
+        return self.path == other.path
 
 def add_handlers():
     from agile_ai.data_marshalling.txt_handler import TxtHandler

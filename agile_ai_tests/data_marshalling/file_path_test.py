@@ -118,3 +118,19 @@ def file_path_test():
                 file_path.put("some text string\nsome other line\n")
                 expect(file_path).to_be(an_existing_path())
 
+    @describe("#__eq__")
+    def _():
+        @describe("when two file paths are equal")
+        def _():
+            @it("returns True")
+            def _(tc: TestContext):
+                path_a = FilePath(tc.test_directory / "some_file.txt")
+                path_b = FilePath(tc.test_directory / "some_file.txt")
+                expect(path_a == path_b).to_be(True)
+        @describe("when two file paths are equal")
+        def _():
+            @it("returns true")
+            def _(tc: TestContext):
+                path_a = FilePath(tc.test_directory / "some_file.txt")
+                path_b = FilePath(tc.test_directory / "some_other_file.txt")
+                expect(path_a == path_b).to_be(False)

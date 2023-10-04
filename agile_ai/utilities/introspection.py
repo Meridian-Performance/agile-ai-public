@@ -17,4 +17,8 @@ class Introspection:
                 current_group[annotation_name] = annotation_type
         return marker_groups
 
+    @classmethod
+    def get_class_name(cls, object_cls):
+        return object_cls.__name__
+
 

@@ -34,3 +34,8 @@ class DirectoryPath(PathLike):
     def __floordiv__(self, directory_string):
         from agile_ai.data_marshalling.file_path import FilePath
         return FilePath(self.path / directory_string)
+
+    def __eq__(self, other):
+        if not isinstance(other, DirectoryPath):
+            return False
+        return self.path == other.path
