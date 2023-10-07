@@ -1,6 +1,7 @@
 from agile_ai.injection.decorators import Marker
 from agile_ai.memoization.warehouse_key import ObjectKey
-from agile_ai.memoization.warehouse_object import ObjectOption, WarehouseObject
+from agile_ai.memoization.warehouse_object import WarehouseObject
+from agile_ai.memoization.object_option import ObjectOption
 from agile_ai.processing.processor import Processor
 from agile_ai.processing.processor_io import IO
 from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, TCBase, describe, it

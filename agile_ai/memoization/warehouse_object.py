@@ -1,8 +1,5 @@
-from typing import Union, Type, Generic, TypeVar
-
 from agile_ai.data_marshalling.directory_path import DirectoryPath
-from agile_ai.injection import Marker
-from agile_ai.memoization.warehouse_key import ObjectKey, KeyPart, WarehouseObjectT
+from agile_ai.memoization.warehouse_key import ObjectKey, KeyPart
 from agile_ai.utilities.introspection import Introspection
 
 
@@ -12,13 +9,17 @@ class WarehouseObject:
     def set_key_part(self, key_part: KeyPart):
         self.key_part = key_part
 
+    def with_key_part(self, key_part: KeyPart):
+        self.set_key_part(key_part)
+        return self
+
     def __init__(self):
         self.key_part = None
 
     def _copy_metadata(self, source_dict: dict, destination_dict: dict):
         cls = self.get_class()
         marker_groups = Introspection.get_marker_groups(cls)
-        metadata_keys = set(marker_groups["__metadata__"].keys())
+        metadata_keys = set(marker_groups.get("__metadata__", {}).keys())
         metadata_keys.add("key_part")
         metadata_keys.add("class_name")
         for metadata_key in metadata_keys:
@@ -68,13 +69,3 @@ class WarehouseObject:
         raise NotImplementedError
 
 
-class ObjectOption(Generic[WarehouseObjectT]):
-    object_or_key: Union[Type[WarehouseObject], ObjectKey]
-
-    def __init__(self, object_or_key: Union[Type[WarehouseObject], ObjectKey]):
-        self.object_or_key = object_or_key
-
-    @staticmethod
-    def Key(object_cls: Type[WarehouseObjectT], key_part: KeyPart):
-        object_key = ObjectKey[WarehouseObjectT](object_cls, key_part)
-        return ObjectOption[WarehouseObjectT](object_key)
