@@ -63,9 +63,9 @@ class WarehouseObject:
         self.store(directory_path)
 
     def fetch(self, directory_path):
-        raise NotImplementedError
+        pass
 
     def store(self, directory_path):
-        raise NotImplementedError
+        pass
 
 

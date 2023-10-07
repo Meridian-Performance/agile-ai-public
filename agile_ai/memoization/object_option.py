@@ -1,9 +1,11 @@
-from typing import Generic, Union, Type, Optional
+from typing import Generic, Union, Type, Optional, TypeVar
 
 from agile_ai.injection.decorators import autowire
-from agile_ai.memoization.warehouse_key import WarehouseObjectT, ObjectKey, KeyPart
+from agile_ai.memoization.warehouse_key import ObjectKey, KeyPart
 from agile_ai.memoization.warehouse_object import WarehouseObject
 from agile_ai.memoization.warehouse_service import WarehouseService
+
+WarehouseObjectT = TypeVar("WarehouseObjectT", bound=WarehouseObject)
 
 
 class ObjectOption(Generic[WarehouseObjectT]):
@@ -12,7 +14,6 @@ class ObjectOption(Generic[WarehouseObjectT]):
     object_instance: Optional[WarehouseObject]
 
     def __init__(self, object_or_key: Union[WarehouseObject, ObjectKey]):
-        self.object_or_key = object_or_key
         if isinstance(object_or_key, ObjectKey):
             self.object_key = object_or_key
             self.object_instance = None
@@ -34,7 +35,8 @@ class ObjectOption(Generic[WarehouseObjectT]):
         return self.warehouse_service.get_object(self.object_key)
 
     def set(self, object_instance: WarehouseObjectT):
-        self.object_instance = object_instance
+        self.object_instance = object_instance.with_key_part(self.object_key.key_part)
+
 
     def put(self):
         self.warehouse_service.put_object(self.object_instance)

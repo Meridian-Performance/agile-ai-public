@@ -164,3 +164,8 @@ class ObjectKey(Generic[WarehouseObjectT], KeyPart):
         object_cls_name, key_part = value
         key_part = KeyPart.from_storage(key_part)
         return ObjectKey(object_cls=None, key_part=key_part, object_cls_name=object_cls_name)
+
+    def __eq__(self, other):
+        if not isinstance(other, ObjectKey):
+            return False
+        return self.to_storage() == other.to_storage()

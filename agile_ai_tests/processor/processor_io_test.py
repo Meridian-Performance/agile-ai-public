@@ -7,7 +7,7 @@ from agile_ai.memoization.warehouse_object import WarehouseObject
 from agile_ai.memoization.object_option import ObjectOption
 from agile_ai.memoization.warehouse_service import WarehouseService
 from agile_ai.processing.processor_io import IO
-from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase
+from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase, fdescribe
 from agile_ai_tests.test_helpers.test_helpers import reset_and_configure_test
 from pynetest.pyne_tester import pyne
 from pynetest.expectations import expect
@@ -15,19 +15,19 @@ from pynetest.test_doubles.stub import MegaStub
 
 
 class SomeInputA(WarehouseObject):
-    def fetch(self, directory_path):
-        pass
-
-    def store(self, directory_path):
-        pass
+    pass
 
 
 class SomeInputB(WarehouseObject):
-    def fetch(self, directory_path):
-        pass
+    pass
 
-    def store(self, directory_path):
-        pass
+
+class SomeOutputA(WarehouseObject):
+    pass
+
+
+class SomeOutputB(WarehouseObject):
+    pass
 
 
 class Inputs(IO):
@@ -36,6 +36,11 @@ class Inputs(IO):
     some_string_parameter: str
     some_float_parameter: float
     some_int_parameter: int
+
+
+class Outputs(IO):
+    some_output_a: ObjectOption[SomeOutputA]
+    some_output_b: ObjectOption[SomeOutputB]
 
 
 class TestContext(TCBase):
@@ -47,7 +52,7 @@ class TestContext(TCBase):
 
     __other__: Marker
     inputs: Inputs
-    outputs: Inputs
+    outputs: Outputs
 
 
 @pyne
@@ -67,7 +72,7 @@ def processor_io_test():
         inputs.some_float_parameter = 4.0
         inputs.some_int_parameter = 1
         tc.inputs = inputs
-        tc.outputs = inputs
+        tc.outputs = Outputs()
 
     @describe("#get_key")
     def _():
@@ -110,12 +115,31 @@ def processor_io_test():
 
     @describe("#store_options")
     def _():
+        @before_each
+        def _(tc: TestContext):
+            tc.outputs.some_output_a = ObjectOption(ObjectKey(SomeOutputA, KeyLiteral("some_key_a")))
+            tc.outputs.some_output_b = ObjectOption(ObjectKey(SomeOutputB, KeyLiteral("some_key_b")))
+
         @it("puts all object instances stored in object options")
         def _(tc: TestContext):
-            some_input_a = SomeInputA().with_key_part(KeyLiteral("some_key_a"))
-            some_input_b = SomeInputB().with_key_part(KeyLiteral("some_key_a"))
-            tc.outputs.some_input_a.set(some_input_a)
-            tc.outputs.some_input_b.set(some_input_b)
-            expect(tc.warehouse_service.has_object(some_input_a.get_object_key()))
-            expect(tc.warehouse_service.has_object(some_input_b.get_object_key()))
+            some_output_a = SomeOutputA()
+            some_output_b = SomeOutputB()
+            tc.outputs.some_output_a.set(some_output_a)
+            tc.outputs.some_output_b.set(some_output_b)
+            tc.outputs.store_options()
+            expect(tc.warehouse_service.has_object(tc.outputs.some_output_a.object_key)).to_be(True)
+            expect(tc.warehouse_service.has_object(tc.outputs.some_output_b.object_key)).to_be(True)
 
+    @describe("#init_options")
+    def _():
+        @it("creates output object options with the specified part key")
+        def _(tc: TestContext):
+            some_output_a = SomeOutputA()
+            some_output_b = SomeOutputB()
+            tc.outputs.init_options(KeyLiteral("some_shared_key_part"))
+            tc.outputs.some_output_a.set(some_output_a)
+            tc.outputs.some_output_b.set(some_output_b)
+            tc.outputs.some_output_a.put()
+            tc.outputs.some_output_b.put()
+            expect(tc.warehouse_service.has_object(tc.outputs.some_output_a.object_key)).to_be(True)
+            expect(tc.warehouse_service.has_object(tc.outputs.some_output_b.object_key)).to_be(True)
