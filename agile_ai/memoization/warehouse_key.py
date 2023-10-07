@@ -1,3 +1,4 @@
+import json
 from hashlib import md5
 from typing import Type, List, Tuple, Union
 
@@ -38,30 +39,55 @@ class KeyPart:
         raise NotImplementedError
 
     @classmethod
-    def from_storage(cls, value: Union[list, str]):
+    def from_storage(cls, value: Union[str, Tuple]):
+        if isinstance(value, tuple):
+            return KeyTuple([KeyPart.from_storage(item) for item in value])
         if isinstance(value, list):
+            return ObjectKey.from_storage(value)
+        if value.startswith("["):
+            return ObjectKey.from_storage(value)
+        if value.startswith("("):
             return KeyTuple.from_storage(value)
-        if isinstance(value, str):
-            return KeyLiteral.from_storage(value)
+        return KeyLiteral.from_storage(value)
 
-    def to_storage(self) -> Tuple:
+    def to_storage(self) -> str:
         raise NotImplementedError
 
 
 class KeyLiteral(KeyPart):
-    def __init__(self, key_string: str):
-        self.key_string = key_string
+    def __init__(self, literal: Union[str, int, float]):
+        self.literal = literal
 
     def get_storage_string(self):
-        return compute_md5_hex(self.key_string)
+        return compute_md5_hex(self.literal)
 
     @classmethod
-    def from_storage(cls, value: str):
-        return KeyLiteral(value)
+    def from_storage(cls, literal: str):
+        if literal.startswith('"'):
+            literal = literal[1:-1]
+        if literal.startswith("int:"):
+            literal = int(literal[4:])
+        elif literal.startswith("float:"):
+            literal = float(literal[6:])
+        return KeyLiteral(literal)
 
     def to_storage(self) -> str:
-        return self.key_string
+        literal_type = None
+        if isinstance(self.literal, int):
+            literal_type = "int"
+        if isinstance(self.literal, float):
+            literal_type = "float"
+        if literal_type:
+            return f'"{literal_type}:{self.literal}"'
+        return f'"{self.literal}"'
 
+    def __eq__(self, other):
+        if not isinstance(other, KeyLiteral):
+            return False
+        return self.literal == other.literal
+
+    def __repr__(self):
+        return f'KeyLiteral<{self.literal}>'
 
 class KeyTuple(KeyPart):
 
@@ -73,12 +99,13 @@ class KeyTuple(KeyPart):
         return compute_md5_hex(values)
 
     @classmethod
-    def from_storage(cls, values: list):
-        key_parts = [KeyPart.from_storage(value) for value in values]
-        return KeyTuple(key_parts)
+    def from_storage(cls, values: str) -> "KeyTuple":
+        items = np.safe_eval(values)
+        items = [KeyPart.from_storage(item) for item in items]
+        return KeyTuple(items)
 
-    def to_storage(self) -> List:
-        return [key_part.to_storage() for key_part in self.key_parts]
+    def to_storage(self) -> str:
+        return "(" + ", ".join([key_part.to_storage() for key_part in self.key_parts]) + ")"
 
 
 def _standardize_key_part(key_part: Union[KeyPart, str]) -> KeyPart:
@@ -98,9 +125,13 @@ def key(key_parts: List["KeyPart"]) -> KeyTuple:
 class ObjectKey(KeyPart):
     object_cls: Type[WarehouseObject]
     key_part: KeyPart
+    object_cls_name: str
 
-    def __init__(self, object_cls: Type[WarehouseObject], key_part: KeyPart):
+    def __init__(self, object_cls: Type[WarehouseObject], key_part: KeyPart, object_cls_name=None):
         self.object_cls = object_cls
+        if not object_cls_name:
+            object_cls_name = Introspection.get_class_name(object_cls)
+        self.object_cls_name = object_cls_name
         self.key_part = key_part
 
     def get_storage_string(self):
@@ -113,14 +144,19 @@ class ObjectKey(KeyPart):
         return KeyTuple([self.get_class_key(), self.key_part])
 
     def get_class_key(self) -> KeyPart:
-        return KeyLiteral(self.get_class_name())
-
-    def get_class_name(self) -> str:
-        return Introspection.get_class_name(self.object_cls)
+        return KeyLiteral(self.object_cls_name)
 
     def get_class(self) -> Type[WarehouseObject]:
         return self.object_cls
 
+    def to_storage(self) -> str:
+        return f'["{self.object_cls_name}", {self.key_part.to_storage()}]'
+
     @classmethod
-    def from_tuple(cls, key_parts_tuple):
-        pass
+    def from_storage(cls, value: Union[str, List]):
+        if isinstance(value, str):
+            items = np.safe_eval(value)
+            return KeyPart.from_storage(items)
+        object_cls_name, key_part = value
+        key_part = KeyPart.from_storage(key_part)
+        return ObjectKey(object_cls=None, key_part=key_part, object_cls_name=object_cls_name)

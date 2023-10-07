@@ -1,3 +1,5 @@
+from typing import Union, Type, Generic, TypeVar
+
 from agile_ai.data_marshalling.directory_path import DirectoryPath
 from agile_ai.injection import Marker
 from agile_ai.memoization.warehouse_key import ObjectKey, KeyPart
@@ -64,3 +66,11 @@ class WarehouseObject:
 
     def store(self, directory_path):
         raise NotImplementedError
+
+
+T = TypeVar("T")
+
+
+class ObjectOption(Generic[T]):
+    def __init__(self, object_class_or_key: Union[Type[WarehouseObject], ObjectKey]):
+        pass

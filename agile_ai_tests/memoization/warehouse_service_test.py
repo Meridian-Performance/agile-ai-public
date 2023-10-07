@@ -92,7 +92,7 @@ def warehouse_service_test():
                 expect(metadata_path).to_be(an_existing_path())
                 metadata_dict = metadata_path.get()
                 expect(metadata_dict["some_data"]).to_be("some_data_value")
-                expect(metadata_dict["key_part"]).to_be("some_key_part")
+                expect(metadata_dict["key_part"]).to_be('"some_key_part"')
                 expect(metadata_dict["class_name"]).to_be("SomeWarehouseObject")
 
             @it("persists data using stores")
@@ -144,7 +144,7 @@ def warehouse_service_test():
                     tc.warehouse_object.get_object_key())
                 expect(warehouse_object.some_data).to_be("some_data_value")
                 expect(warehouse_object.key_part).to_be_a(KeyLiteral)
-                expect(warehouse_object.key_part.to_storage()).to_be("some_key_part")
+                expect(warehouse_object.key_part.to_storage()).to_be('"some_key_part"')
 
             @it("persists data using fetch")
             def _(tc: TestContext):

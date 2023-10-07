@@ -30,7 +30,7 @@ class WarehouseService:
         object_instance.save(object_path)
 
     def get_object(self, key: ObjectKey):
-        class_name = key.get_class_name()
+        class_name = key.object_cls_name
         object_class = self.lookup_class_by_name(class_name)
         object_path = self.get_object_path(key)
         return object_class.load(object_path)
@@ -46,4 +46,4 @@ class WarehouseService:
         return (object_path // "metadata.json").exists()
 
     def get_object_path(self, key: ObjectKey) -> DirectoryPath:
-        return self.warehouse_directory / self.partition_name / key.get_class_name() / key.get_key_part().get_storage_string()
+        return self.warehouse_directory / self.partition_name / key.object_cls_name / key.get_key_part().get_storage_string()
