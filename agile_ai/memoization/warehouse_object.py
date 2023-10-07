@@ -2,7 +2,7 @@ from typing import Union, Type, Generic, TypeVar
 
 from agile_ai.data_marshalling.directory_path import DirectoryPath
 from agile_ai.injection import Marker
-from agile_ai.memoization.warehouse_key import ObjectKey, KeyPart
+from agile_ai.memoization.warehouse_key import ObjectKey, KeyPart, WarehouseObjectT
 from agile_ai.utilities.introspection import Introspection
 
 
@@ -68,9 +68,13 @@ class WarehouseObject:
         raise NotImplementedError
 
 
-T = TypeVar("T")
+class ObjectOption(Generic[WarehouseObjectT]):
+    object_or_key: Union[Type[WarehouseObject], ObjectKey]
 
+    def __init__(self, object_or_key: Union[Type[WarehouseObject], ObjectKey]):
+        self.object_or_key = object_or_key
 
-class ObjectOption(Generic[T]):
-    def __init__(self, object_class_or_key: Union[Type[WarehouseObject], ObjectKey]):
-        pass
+    @staticmethod
+    def Key(object_cls: Type[WarehouseObjectT], key_part: KeyPart):
+        object_key = ObjectKey[WarehouseObjectT](object_cls, key_part)
+        return ObjectOption[WarehouseObjectT](object_key)

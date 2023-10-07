@@ -1,6 +1,6 @@
 import json
 from hashlib import md5
-from typing import Type, List, Tuple, Union
+from typing import Type, List, Tuple, Union, TypeVar, Generic
 
 import numpy as np
 
@@ -89,6 +89,7 @@ class KeyLiteral(KeyPart):
     def __repr__(self):
         return f'KeyLiteral<{self.literal}>'
 
+
 class KeyTuple(KeyPart):
 
     def __init__(self, key_parts: List[KeyPart]):
@@ -122,7 +123,10 @@ def key(key_parts: List["KeyPart"]) -> KeyTuple:
     return KeyTuple(key_parts)
 
 
-class ObjectKey(KeyPart):
+WarehouseObjectT = TypeVar("WarehouseObjectT", bound=WarehouseObject)
+
+
+class ObjectKey(Generic[WarehouseObjectT], KeyPart):
     object_cls: Type[WarehouseObject]
     key_part: KeyPart
     object_cls_name: str
