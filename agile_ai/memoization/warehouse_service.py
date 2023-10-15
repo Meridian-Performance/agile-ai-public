@@ -1,11 +1,12 @@
 from typing import Type
 
 from agile_ai.data_marshalling.directory_path import DirectoryPath
+from agile_ai.injection.interfaces import Service
 from agile_ai.memoization.warehouse_key import ObjectKey
 from agile_ai.memoization.warehouse_object import WarehouseObject
 
 
-class WarehouseService:
+class WarehouseService(Service):
     partition_name: str
     warehouse_directory: DirectoryPath
 
@@ -47,3 +48,9 @@ class WarehouseService:
 
     def get_object_path(self, key: ObjectKey) -> DirectoryPath:
         return self.warehouse_directory / self.partition_name / key.object_cls_name / key.get_key_part().get_storage_string()
+
+
+def register_object_class(object_class):
+    from agile_ai.injection.decorators import get_service
+    warehouse_service = get_service(WarehouseService)
+    warehouse_service.register_object_class(object_class)

@@ -7,7 +7,7 @@ from agile_ai.memoization.warehouse_object import WarehouseObject
 from agile_ai.memoization.object_option import ObjectOption
 from agile_ai.memoization.warehouse_service import WarehouseService
 from agile_ai.processing.processor_io import IO
-from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase, fdescribe
+from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase, fdescribe, fit
 from agile_ai_tests.test_helpers.test_helpers import reset_and_configure_test
 from pynetest.pyne_tester import pyne
 from pynetest.expectations import expect
@@ -93,14 +93,15 @@ def processor_io_test():
     def _():
         @before_each
         def _(tc: TestContext):
-            some_input_a = SomeInputA().with_key_part(KeyLiteral("some_key_a"))
+            some_input_a = SomeInputA().with_key_part(KeyLiteral("some_key_part"))
             tc.warehouse_service.put_object(some_input_a)
+            tc.inputs.init_options(KeyLiteral("some_key_part"))
 
         @describe("when all options are present")
         def _():
             @before_each
             def _(tc: TestContext):
-                some_input_b = SomeInputB().with_key_part(KeyLiteral("some_key_b"))
+                some_input_b = SomeInputB().with_key_part(KeyLiteral("some_key_part"))
                 tc.warehouse_service.put_object(some_input_b)
 
             @it("returns True")

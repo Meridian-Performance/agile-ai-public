@@ -1,4 +1,3 @@
-import json
 from hashlib import md5
 from typing import Type, List, Tuple, Union, TypeVar, Generic
 
@@ -7,7 +6,7 @@ import numpy as np
 from agile_ai.utilities.introspection import Introspection
 from agile_ai.utilities.option import Option
 
-WarehouseObject = "agile_ai.memoization.warehouse_object.WarehouseObject"
+WarehouseObjectAlias = "agile_ai.memoization.warehouse_object.WarehouseObject"
 
 
 def compute_md5_hex(values):
@@ -123,15 +122,15 @@ def key(key_parts: List["KeyPart"]) -> KeyTuple:
     return KeyTuple(key_parts)
 
 
-WarehouseObjectT = TypeVar("WarehouseObjectT", bound=WarehouseObject)
+WarehouseObjectT = TypeVar("WarehouseObjectT", bound=WarehouseObjectAlias)
 
 
 class ObjectKey(Generic[WarehouseObjectT], KeyPart):
-    object_cls: Type[WarehouseObject]
+    object_cls: Type[WarehouseObjectAlias]
     key_part: KeyPart
     object_cls_name: str
 
-    def __init__(self, object_cls: Type[WarehouseObject], key_part: KeyPart, object_cls_name=None):
+    def __init__(self, object_cls: Type[WarehouseObjectAlias], key_part: KeyPart, object_cls_name=None):
         self.object_cls = object_cls
         if not object_cls_name:
             object_cls_name = Introspection.get_class_name(object_cls)
@@ -150,7 +149,7 @@ class ObjectKey(Generic[WarehouseObjectT], KeyPart):
     def get_class_key(self) -> KeyPart:
         return KeyLiteral(self.object_cls_name)
 
-    def get_class(self) -> Type[WarehouseObject]:
+    def get_class(self) -> Type[WarehouseObjectAlias]:
         return self.object_cls
 
     def to_storage(self) -> str:

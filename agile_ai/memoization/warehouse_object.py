@@ -24,8 +24,7 @@ class WarehouseObject:
         metadata_keys.add("class_name")
         for metadata_key in metadata_keys:
             metadata_value = source_dict.get(metadata_key)
-            if metadata_value:
-                destination_dict[metadata_key] = metadata_value
+            destination_dict[metadata_key] = metadata_value
         return destination_dict
 
     def get_metadata_dict(self) -> dict:

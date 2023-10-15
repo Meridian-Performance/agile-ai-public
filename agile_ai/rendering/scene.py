@@ -4,6 +4,7 @@ from typing import List, NamedTuple, Callable
 import numpy as np
 
 from agile_ai.geometry.colored_mesh import ColoredMesh
+from agile_ai.injection.interfaces import Service
 
 
 @dataclass
@@ -29,7 +30,7 @@ class SceneCallbacks(NamedTuple):
     set_frame_camera_world_callback: Callable = noop
 
 
-class Scene:
+class Scene(Service):
     mesh_list: List[MeshEntry]
     callbacks: SceneCallbacks
 

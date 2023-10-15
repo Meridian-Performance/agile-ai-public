@@ -21,4 +21,11 @@ class Introspection:
     def get_class_name(cls, object_cls):
         return object_cls.__name__
 
+    @classmethod
+    def is_subclass(cls, subclass_cls, parent_cls):
+        try:
+            return issubclass(subclass_cls, parent_cls)
+        except:
+            return False
+
 

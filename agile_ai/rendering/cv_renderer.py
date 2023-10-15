@@ -3,6 +3,7 @@ from typing import NamedTuple
 import cv2
 import numpy as np
 
+from agile_ai.injection.interfaces import Service
 from agile_ai.rendering.renderer_interface import RendererInterface
 from agile_ai.rendering.scene import Scene, SceneCallbacks
 
@@ -11,7 +12,7 @@ class RenderData(NamedTuple):
     color: np.ndarray
 
 
-class CvRenderer(RendererInterface):
+class CvRenderer(RendererInterface, Service):
     scene: Scene
 
     def __init__(self):

@@ -1,3 +1,5 @@
+from typing import Callable
+
 from agile_ai.injection.decorators import Marker
 from agile_ai.memoization.warehouse_key import ObjectKey, KeyLiteral
 from agile_ai.memoization.warehouse_object import WarehouseObject
@@ -42,6 +44,9 @@ class ProcessorA(Processor):
         outputs.some_output_a.set(SomeOutputA())
         outputs.some_output_b.set(SomeOutputB())
 
+    inputs: Inputs
+    resolve: Callable[..., Outputs]
+
 
 class TestContext(TCBase):
     __services__: Marker
@@ -66,7 +71,8 @@ def processing_test():
         some_input_b = SomeInputA().with_key_part(KeyLiteral("some_input_b"))
         tc.warehouse_service.put_object(some_input_a)
         tc.warehouse_service.put_object(some_input_b)
-        inputs = ProcessorA.Inputs()
+        tc.processor = ProcessorA()
+        inputs = tc.processor.inputs
         inputs.some_input_a = ObjectOption(some_input_a)
         inputs.some_input_b = ObjectOption(some_input_b)
         tc.inputs = inputs
@@ -87,7 +93,6 @@ def processing_test():
     def _():
         @before_each
         def _(tc: TestContext):
-            tc.processor = ProcessorA()
             tc.stubs = attach_spy(tc.processor, "perform")
 
         @describe("when all outputs exist")
@@ -101,7 +106,7 @@ def processing_test():
             @it("doesn't call perform")
             @with_stubs
             def _(tc: TestContext):
-                outputs = tc.processor.resolve(tc.inputs)
+                outputs = tc.processor.resolve()
                 expect(outputs).to_be_a(ProcessorA.Outputs)
                 expect(tc.processor.perform).was_not_called()
 
@@ -110,6 +115,6 @@ def processing_test():
             @it("calls perform")
             @with_stubs
             def _(tc: TestContext):
-                outputs = tc.processor.resolve(tc.inputs)
+                outputs = tc.processor.resolve()
                 expect(outputs).to_be_a(ProcessorA.Outputs)
                 expect(tc.processor.perform).was_called()

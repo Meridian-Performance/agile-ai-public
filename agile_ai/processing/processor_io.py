@@ -1,18 +1,21 @@
-from typing import Type
+from typing import Type, Optional
 
 from agile_ai.memoization.warehouse_key import KeyTuple, KeyLiteral, ObjectKey, KeyPart
 from agile_ai.memoization.object_option import ObjectOption
 from agile_ai.memoization.warehouse_object import WarehouseObject
+from agile_ai.utilities.option import Option
 
 
 class IO:
+    def __init__(self):
+        self.key_part = None
 
     def get_items(self):
         for field_name, key_type in self.__annotations__.items():
             key_value = getattr(self, field_name)
             yield field_name, key_type, key_value
 
-    def get_key(self) -> KeyTuple:
+    def get_key(self) -> Optional[KeyTuple]:
         key_list = []
         for field_name, key_type, key_value in self.get_items():
             if key_type in [str, int, float]:
@@ -22,11 +25,14 @@ class IO:
             elif isinstance(key_value, ObjectOption):
                 key = key_value.object_key
             else:
-                raise NotImplementedError(f"Unhandled key_type {key_type}")
+                return None
+                # raise NotImplementedError(f"Unhandled key_type {key_type}")
             key_list.append(key)
         return KeyTuple(key_list)
 
     def all_options_present(self) -> bool:
+        if self.key_part is None:
+            return False
         for field_name, key_type, key_value in self.get_items():
             if isinstance(key_value, ObjectOption):
                 if key_value.is_empty():
@@ -39,6 +45,7 @@ class IO:
                 key_value.put()
 
     def init_options(self, key_part: KeyPart):
+        self.key_part = key_part
         for field_name, key_type in self.__annotations__.items():
             if "ObjectOption" in str(key_type):
                 object_cls: Type[WarehouseObject] = key_type.__args__[0]
