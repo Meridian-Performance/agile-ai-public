@@ -1,6 +1,6 @@
+from .gl_core import GLCore
 from .renderer_interface import RendererInterface
 from .scene import Scene, SceneCallbacks
-from .gl_core import GLCore
 
 
 class GLRenderer(RendererInterface):

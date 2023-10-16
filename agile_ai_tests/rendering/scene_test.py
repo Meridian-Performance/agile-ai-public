@@ -3,13 +3,13 @@ import numpy as np
 from agile_ai.geometry.colored_mesh import ColoredMesh
 from agile_ai.geometry.pose_conversions import Rx
 from agile_ai.geometry.shapes.cube import Cube
-from agile_ai.injection.decorators import autowire_services, Marker
+from agile_ai.injection.decorators import Marker
 from agile_ai.rendering.scene import Scene
 from agile_ai_tests.test_helpers.pyne_future import exactly_equal_to_array
-from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase, fit
+from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase
 from agile_ai_tests.test_helpers.test_helpers import reset_and_configure_test
-from pynetest.pyne_tester import pyne
 from pynetest.expectations import expect
+from pynetest.pyne_tester import pyne
 from pynetest.test_doubles.stub import MegaStub
 
 

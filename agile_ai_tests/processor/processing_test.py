@@ -1,18 +1,18 @@
 from typing import Callable
 
 from agile_ai.injection.decorators import Marker
+from agile_ai.memoization.object_option import ObjectOption
 from agile_ai.memoization.warehouse_key import ObjectKey, KeyLiteral
 from agile_ai.memoization.warehouse_object import WarehouseObject
-from agile_ai.memoization.object_option import ObjectOption
 from agile_ai.memoization.warehouse_service import WarehouseService
 from agile_ai.processing.processor import Processor
 from agile_ai.processing.processor_io import IO
 from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, TCBase, describe, it, with_stubs
 from agile_ai_tests.test_helpers.test_helpers import reset_and_configure_test
+from pynetest.expectations import expect
 from pynetest.pyne_tester import pyne
 from pynetest.test_doubles.attached_spy import AttachedSpy, attach_spy
 from pynetest.test_doubles.stub import MegaStub
-from pynetest.expectations import expect
 
 
 class SomeInputA(WarehouseObject):

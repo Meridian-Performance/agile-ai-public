@@ -1,6 +1,6 @@
 from typing import Generic, Union, Type, Optional, TypeVar
 
-from agile_ai.injection.decorators import autowire, get_service
+from agile_ai.injection.decorators import get_service
 from agile_ai.memoization.warehouse_key import ObjectKey, KeyPart
 from agile_ai.memoization.warehouse_object import WarehouseObject
 

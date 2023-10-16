@@ -7,7 +7,7 @@ from agile_ai.rendering.scene import Scene
 from agile_ai_tests.rendering import rendering_test_helpers
 from agile_ai_tests.rendering.rendering_test_helpers import test_cases, show_test, get_test_case_image, \
     expect_image_match, get_test_planes
-from agile_ai_tests.test_helpers.pyne_test_helpers import TCBase, before_each, it, describe, fit
+from agile_ai_tests.test_helpers.pyne_test_helpers import TCBase, before_each, it, describe
 from agile_ai_tests.test_helpers.test_helpers import reset_and_configure_test
 from pynetest.expectations import expect
 from pynetest.pyne_tester import pyne

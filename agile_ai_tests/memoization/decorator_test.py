@@ -1,6 +1,6 @@
 from agile_ai.memoization.decorators import all_args_constructor, self_last_args_memo
 from pynetest.expectations import expect
-from pynetest.pyne_test_collector import before_each, it, describe, fdescribe
+from pynetest.pyne_test_collector import before_each, it, describe
 from pynetest.pyne_tester import pyne
 
 

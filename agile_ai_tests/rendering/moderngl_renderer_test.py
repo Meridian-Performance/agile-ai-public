@@ -3,7 +3,7 @@ from agile_ai.rendering.moderngl_renderer import ModernGLRenderer
 from agile_ai.rendering.scene import Scene
 from agile_ai_tests.rendering.rendering_test_helpers import get_test_planes, expect_image_match, get_test_spheres, \
     expect_depth_mask_match, expect_xyz_world_match
-from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase, fit
+from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase
 from pynetest.expectations import expect
 from pynetest.pyne_tester import pyne
 from pynetest.test_doubles.stub import MegaStub

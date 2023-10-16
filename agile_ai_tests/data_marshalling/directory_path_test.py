@@ -6,8 +6,8 @@ from agile_ai.data_marshalling.filesystem import remove_path
 from agile_ai.injection.decorators import Marker
 from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, TCBase, it, describe
 from agile_ai_tests.test_helpers.test_helpers import reset_and_configure_test
-from pynetest.pyne_tester import pyne
 from pynetest.expectations import expect
+from pynetest.pyne_tester import pyne
 from pynetest.test_doubles.stub import MegaStub
 
 test_directory = Path("/tmp/agile_ai_tests")

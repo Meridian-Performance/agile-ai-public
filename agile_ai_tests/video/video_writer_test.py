@@ -1,7 +1,7 @@
 from typing import Tuple
 
 import numpy as np
-from matplotlib.pyplot import jet
+import pylab
 
 from agile_ai.data_marshalling.file_path import FilePath
 from agile_ai.injection.decorators import Marker
@@ -14,7 +14,7 @@ from agile_ai_tests.test_helpers.test_helpers import reset_and_configure_test
 from pynetest.expectations import expect
 from pynetest.pyne_tester import pyne
 from pynetest.test_doubles.stub import MegaStub
-import pylab
+
 
 class TestContext(TCBase):
     __services__: Marker

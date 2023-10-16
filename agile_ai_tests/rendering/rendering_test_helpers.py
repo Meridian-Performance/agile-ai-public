@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import List, NamedTuple
 
 import numpy as np
@@ -9,9 +8,9 @@ from agile_ai.geometry.pose_conversions import Rx, Ry, Rz
 from agile_ai.geometry.shapes.cube import Cube
 from agile_ai.geometry.shapes.planar import Plane
 from agile_ai.geometry.shapes.sor import Sor, Sphere
+from agile_ai.rendering.color_packer import ColorPacker
 from agile_ai.rendering.renderer_interface import RendererInterface
 from agile_ai.rendering.scene import Scene
-from agile_ai.rendering.color_packer import ColorPacker
 from pynetest.expectations import expect
 
 

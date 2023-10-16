@@ -1,8 +1,8 @@
 from typing import Tuple
 
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_agg import FigureCanvasAgg
 import numpy as np
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.figure import Figure
 
 from agile_ai.drawing.canvas import FixedCanvas
 

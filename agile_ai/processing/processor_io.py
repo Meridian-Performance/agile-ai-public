@@ -1,9 +1,8 @@
 from typing import Type, Optional
 
-from agile_ai.memoization.warehouse_key import KeyTuple, KeyLiteral, ObjectKey, KeyPart
 from agile_ai.memoization.object_option import ObjectOption
+from agile_ai.memoization.warehouse_key import KeyTuple, KeyLiteral, ObjectKey, KeyPart
 from agile_ai.memoization.warehouse_object import WarehouseObject
-from agile_ai.utilities.option import Option
 
 
 class IO:

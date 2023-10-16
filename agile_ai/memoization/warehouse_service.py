@@ -3,7 +3,7 @@ from typing import Type, List, TypeVar
 from agile_ai.data_marshalling.directory_path import DirectoryPath
 from agile_ai.injection.interfaces import Service
 from agile_ai.memoization.object_option import ObjectOption
-from agile_ai.memoization.warehouse_key import ObjectKey, KeyLiteral, StorageKey
+from agile_ai.memoization.warehouse_key import ObjectKey, StorageKey
 from agile_ai.memoization.warehouse_object import WarehouseObject
 
 WarehouseObjectT = TypeVar("WarehouseObjectT", bound=WarehouseObject)

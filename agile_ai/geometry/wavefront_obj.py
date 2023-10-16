@@ -1,7 +1,8 @@
 from typing import Iterable, List
 
-from agile_ai.geometry.mesh import Mesh
 import numpy as np
+
+from agile_ai.geometry.mesh import Mesh
 
 
 class WavefrontObj:

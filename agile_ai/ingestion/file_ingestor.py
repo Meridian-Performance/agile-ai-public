@@ -3,7 +3,7 @@ from typing import Callable
 from agile_ai.configuration.ingestion_configuration import IngestionConfiguration
 from agile_ai.data_marshalling import filesystem
 from agile_ai.data_marshalling.file_path import FilePath
-from agile_ai.ingestion.file_info_ingestor import FileInfo, FileInfoIngestor
+from agile_ai.ingestion.file_info_ingestor import FileInfo
 from agile_ai.injection import Marker
 from agile_ai.memoization.object_option import ObjectOption
 from agile_ai.memoization.warehouse_object import WarehouseObject

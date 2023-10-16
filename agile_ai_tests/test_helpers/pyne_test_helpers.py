@@ -1,7 +1,9 @@
 import types
 from typing import Optional, Iterable
 
+from agile_ai.data_marshalling.directory_path import DirectoryPath
 from agile_ai.injection.decorators import autowire_services
+from libraries.pynetest.test_doubles.stub import MegaStub
 from pynetest.pyne_test_collector import before_each as old_before_each
 from pynetest.pyne_test_collector import describe as old_describe
 from pynetest.pyne_test_collector import fdescribe as old_fdescribe
@@ -9,9 +11,6 @@ from pynetest.pyne_test_collector import fit as old_fit
 from pynetest.pyne_test_collector import it as old_it
 from pynetest.pyne_test_collector import xdescribe as old_xdescribe
 from pynetest.pyne_test_collector import xit as old_xit
-
-from agile_ai.data_marshalling.directory_path import DirectoryPath
-from libraries.pynetest.test_doubles.stub import MegaStub
 
 describe = old_describe
 xdescribe = old_xdescribe

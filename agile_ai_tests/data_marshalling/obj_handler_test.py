@@ -1,6 +1,5 @@
 from pathlib import Path
 
-from agile_ai.data_marshalling.file_handler import FileHandler
 from agile_ai.data_marshalling.obj_handler import ObjHandler
 from agile_ai.geometry.mesh import Mesh
 from agile_ai.geometry.shapes.cube import Cube

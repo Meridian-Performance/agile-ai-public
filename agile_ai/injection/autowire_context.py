@@ -1,6 +1,3 @@
-from functools import partial
-
-
 class AutowireContext:
     def __init__(self):
         self.instance_by_cls = dict()

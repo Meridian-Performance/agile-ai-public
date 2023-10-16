@@ -1,7 +1,6 @@
 from typing import List, Callable, Dict, Tuple
 
 from agile_ai.configuration.ingestion_configuration import IngestionConfiguration
-from agile_ai.data_marshalling.file_path import FilePath
 from agile_ai.injection import Marker
 from agile_ai.memoization.md5_helper import Md5Helper
 from agile_ai.memoization.object_option import ObjectOption

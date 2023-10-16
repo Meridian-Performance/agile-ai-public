@@ -1,6 +1,5 @@
 # Import all data types
 from pathlib import Path
-from typing import Union
 
 
 class FileHandler:
