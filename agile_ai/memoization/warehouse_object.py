@@ -51,15 +51,42 @@ class WarehouseObject:
         class_instance = cls()
         class_instance.set_metadata_dict(metadata_dict)
         class_instance.fetch(directory_path)
+        class_instance.copy_object_keys_from_metadata(metadata_dict)
         return class_instance
 
     def save(self, directory_path: DirectoryPath):
         metadata_dict = self.get_metadata_dict()
         metadata_dict["key_part"] = metadata_dict["key_part"].to_storage()
         metadata_dict["class_name"] = self.get_class_name()
+        self.copy_object_keys_to_metadata(metadata_dict)
         directory_path.ensure_exists()
         (directory_path // "metadata.json").put(metadata_dict)
         self.store(directory_path)
+
+    def get_object_attribute_names(self):
+        cls = self.get_class()
+        marker_groups = Introspection.get_marker_groups(cls)
+        object_keys = set(marker_groups.get("__objects__", {}).keys())
+        return object_keys
+
+    def copy_object_keys_to_metadata(self, metadata_dict):
+        from agile_ai.memoization.object_option import ObjectOption
+        object_names = self.get_object_attribute_names()
+        for object_name in object_names:
+            object_option: ObjectOption = getattr(self, object_name)
+            object_key = object_option.object_key.to_storage()
+            metadata_dict[object_name] = object_key
+
+    def copy_object_keys_from_metadata(self, metadata_dict):
+        from agile_ai.memoization.object_option import ObjectOption
+        object_names = self.get_object_attribute_names()
+        for object_name in object_names:
+            value = metadata_dict[object_name]
+            object_key = ObjectKey.from_storage(value)
+            object_option = ObjectOption(object_key)
+            setattr(self, object_name, object_option)
+
+
 
     def fetch(self, directory_path):
         pass

@@ -1,5 +1,6 @@
 from agile_ai.data_marshalling.directory_path import DirectoryPath
 from agile_ai.injection.decorators import autowire_services, Marker
+from agile_ai.memoization.object_option import ObjectOption
 from agile_ai.memoization.warehouse_key import ObjectKey, KeyLiteral, KeyPart
 from agile_ai.memoization.warehouse_object import WarehouseObject
 from agile_ai.memoization.warehouse_service import WarehouseService
@@ -11,14 +12,22 @@ from pynetest.expectations import expect
 from pynetest.test_doubles.stub import MegaStub
 
 
+class SomeOtherWarehouseObject(WarehouseObject):
+    __metadata__: Marker
+    some_other_data: str
+
+
 class SomeWarehouseObject(WarehouseObject):
     __metadata__: Marker
     some_data: str
 
-    def fetch(self, directory_path):
+    __objects__: Marker
+    some_other_object: ObjectOption[SomeOtherWarehouseObject]
+
+    def fetch(self, directory_path: DirectoryPath):
         self.some_file_data = (directory_path // "some_file.json").get()
 
-    def store(self, directory_path):
+    def store(self, directory_path: DirectoryPath):
         (directory_path // "some_file.json").put(self.some_file_data)
 
 
@@ -83,6 +92,7 @@ def warehouse_service_test():
                 tc.warehouse_object.some_data = "some_data_value"
                 tc.warehouse_object.some_file_data = "some_file_data_value"
                 tc.warehouse_object.set_key_part(KeyLiteral("some_key_part"))
+                tc.warehouse_object.some_other_object = ObjectOption(ObjectKey(SomeOtherWarehouseObject, KeyLiteral("some_other_object_key")))
 
             @it("stores the metadata with the object_key")
             def _(tc: TestContext):
@@ -94,6 +104,16 @@ def warehouse_service_test():
                 expect(metadata_dict["some_data"]).to_be("some_data_value")
                 expect(metadata_dict["key_part"]).to_be('"some_key_part"')
                 expect(metadata_dict["class_name"]).to_be("SomeWarehouseObject")
+
+            @it("stores the metadata with the reference object_key")
+            def _(tc: TestContext):
+                tc.warehouse_service.put_object(tc.warehouse_object)
+                object_directory = tc.warehouse_service.get_object_path(tc.warehouse_object.get_object_key())
+                metadata_path = object_directory // "metadata.json"
+                metadata_dict = metadata_path.get()
+                other_object_key = ObjectKey(SomeOtherWarehouseObject, KeyLiteral("some_other_object_key"))
+                expect(metadata_dict["some_other_object"]).to_be(other_object_key.to_storage())
+
 
             @it("persists data using stores")
             def _(tc: TestContext):
@@ -128,23 +148,36 @@ def warehouse_service_test():
             @before_each
             def _(tc: TestContext):
                 tc.warehouse_object = SomeWarehouseObject()
+                tc.warehouse_service.register_object_class(SomeOtherWarehouseObject)
                 tc.warehouse_object.some_data = "some_data_value"
                 tc.warehouse_object.some_file_data = "some_file_data_value"
                 tc.warehouse_object.set_key_part(KeyLiteral("some_key_part"))
+                some_other_object = SomeOtherWarehouseObject().with_key_part(KeyLiteral("some_other_object_key"))
+                tc.warehouse_object.some_other_object = ObjectOption(some_other_object)
                 tc.warehouse_service.put_object(tc.warehouse_object)
+                tc.warehouse_service.put_object(some_other_object)
 
             @it("returns an instance of the cls from the ObjectKey")
             def _(tc: TestContext):
                 warehouse_object = tc.warehouse_service.get_object(tc.warehouse_object.get_object_key())
                 expect(warehouse_object).to_be_a(SomeWarehouseObject)
 
-            @it("returns sets the values from the metadata")
+            @it("sets the values from the metadata")
             def _(tc: TestContext):
                 warehouse_object: SomeWarehouseObject = tc.warehouse_service.get_object(
                     tc.warehouse_object.get_object_key())
                 expect(warehouse_object.some_data).to_be("some_data_value")
                 expect(warehouse_object.key_part).to_be_a(KeyLiteral)
                 expect(warehouse_object.key_part.to_storage()).to_be('"some_key_part"')
+
+            @it("sets the ObjectOption keys from the metadata")
+            def _(tc: TestContext):
+                warehouse_object: SomeWarehouseObject = tc.warehouse_service.get_object(
+                    tc.warehouse_object.get_object_key())
+                expect(warehouse_object.some_other_object).to_be_a(ObjectOption)
+                expect(warehouse_object.some_other_object.object_key).to_be_a(ObjectKey)
+                expect(warehouse_object.some_other_object.object_key).to_be(tc.warehouse_object.some_other_object.object_key)
+                expect(warehouse_object.some_other_object.is_present()).to_be(True)
 
             @it("persists data using fetch")
             def _(tc: TestContext):
