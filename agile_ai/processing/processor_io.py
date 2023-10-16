@@ -30,6 +30,12 @@ class IO:
             key_list.append(key)
         return KeyTuple(key_list)
 
+    def has_options(self):
+        for field_name, key_type, key_value in self.get_items():
+            if isinstance(key_value, ObjectOption):
+                return True
+        return False
+
     def all_options_present(self) -> bool:
         if self.key_part is None:
             return False
@@ -54,4 +60,5 @@ class IO:
                 object_instance = object_cls().with_key_part(key_part)
                 key_value = ObjectOption(object_instance)
                 setattr(self, field_name, key_value)
+
 

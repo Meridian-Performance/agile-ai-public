@@ -34,7 +34,7 @@ class Processor:
 
     def resolve(self) -> IO:
         outputs = self._get_outputs(self.inputs)
-        if outputs.all_options_present():
+        if outputs.has_options() and outputs.all_options_present():
             return outputs
         return self.perform_super(self.inputs)
 
