@@ -5,6 +5,13 @@ class Introspection:
         return cls.__annotations__
 
     @staticmethod
+    def get_annotation_items(cls):
+        if not hasattr(cls, "__annotations__"):
+            return []
+        else:
+            return cls.__annotations__.items()
+
+    @staticmethod
     def get_marker_groups(cls):
         annotations = Introspection.get_annotations(cls)
         current_group = dict()
@@ -27,5 +34,6 @@ class Introspection:
             return issubclass(subclass_cls, parent_cls)
         except:
             return False
+
 
 

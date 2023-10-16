@@ -3,6 +3,7 @@ from typing import Type, Optional
 from agile_ai.memoization.object_option import ObjectOption
 from agile_ai.memoization.warehouse_key import KeyTuple, KeyLiteral, ObjectKey, KeyPart
 from agile_ai.memoization.warehouse_object import WarehouseObject
+from agile_ai.utilities.introspection import Introspection
 
 
 class IO:
@@ -10,7 +11,7 @@ class IO:
         self.key_part = None
 
     def get_items(self):
-        for field_name, key_type in self.__annotations__.items():
+        for field_name, key_type in Introspection.get_annotation_items(self):
             key_value = getattr(self, field_name)
             yield field_name, key_type, key_value
 
@@ -47,7 +48,7 @@ class IO:
 
     def init_options(self, key_part: KeyPart):
         self.key_part = key_part
-        for field_name, key_type in self.__annotations__.items():
+        for field_name, key_type in Introspection.get_annotation_items(self):
             if "ObjectOption" in str(key_type):
                 object_cls: Type[WarehouseObject] = key_type.__args__[0]
                 object_instance = object_cls().with_key_part(key_part)
