@@ -49,3 +49,4 @@ class ObjectOption(Generic[WarehouseObjectT]):
 
     def put(self):
         self.warehouse_service.put_object(self._object_instance)
+        return self

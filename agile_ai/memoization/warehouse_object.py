@@ -9,6 +9,7 @@ class WarehouseObject:
 
     def set_key_part(self, key_part: KeyPart):
         self.key_part = key_part
+        return self
 
     def with_key_part(self, key_part: KeyPart):
         self.set_key_part(key_part)
@@ -97,3 +98,7 @@ class WarehouseObject:
 
     def store(self, directory_path):
         pass
+
+    def allocate_storage(self):
+        self.get_object_path().ensure_exists()
+        return self
