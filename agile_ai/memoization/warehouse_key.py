@@ -168,3 +168,26 @@ class ObjectKey(Generic[WarehouseObjectT], KeyPart):
         if not isinstance(other, ObjectKey):
             return False
         return self.to_storage() == other.to_storage()
+
+
+class StorageKey(KeyPart):
+    def __init__(self, md5_hex: str):
+        self.md5_hex = md5_hex
+
+    def get_storage_string(self):
+        return self.md5_hex
+
+    @classmethod
+    def from_storage(cls, md5_hex: str):
+        raise NotImplementedError
+
+    def to_storage(self) -> str:
+        return self.md5_hex
+
+    def __eq__(self, other):
+        if not isinstance(other, StorageKey):
+            return False
+        return self.md5_hex == other.md5_hex
+
+    def __repr__(self):
+        return f'StorageKey<{self.md5_hex}>'

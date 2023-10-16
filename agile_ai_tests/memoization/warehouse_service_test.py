@@ -184,3 +184,30 @@ def warehouse_service_test():
                 warehouse_object: SomeWarehouseObject = tc.warehouse_service.get_object(
                     tc.warehouse_object.get_object_key())
                 expect(warehouse_object.some_file_data).to_be("some_file_data_value")
+
+        @describe("#get_object_options")
+        def _():
+            @before_each
+            def _(tc: TestContext):
+                warehouse_object = SomeWarehouseObject()
+                some_other_object = SomeOtherWarehouseObject().with_key_part(KeyLiteral("some_other_object_key"))
+                warehouse_object.some_data = "some_data_value"
+                warehouse_object.some_file_data = "some_file_data_value"
+                warehouse_object.set_key_part(KeyLiteral("some_key_part"))
+                warehouse_object.some_other_object = ObjectOption(some_other_object)
+                tc.warehouse_service.put_object(warehouse_object)
+                warehouse_object = SomeWarehouseObject()
+                warehouse_object.some_data = "some_other_data_value"
+                warehouse_object.some_file_data = "some_other_file_data_value"
+                warehouse_object.set_key_part(KeyLiteral("some_other_key_part"))
+                warehouse_object.some_other_object = ObjectOption(some_other_object)
+                tc.warehouse_service.put_object(warehouse_object)
+                tc.warehouse_service.put_object(some_other_object)
+
+            @it("returns a list of ObjectOptions for every warehouse object of the specified type")
+            def _(tc: TestContext):
+                object_options = tc.warehouse_service.get_object_options(SomeWarehouseObject)
+                expect(object_options).to_have_length(2)
+                expect(object_options[0]).to_be_a(ObjectOption)
+                expect(object_options[0].get()).to_be_a(SomeWarehouseObject)
+

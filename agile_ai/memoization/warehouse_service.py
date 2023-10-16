@@ -1,9 +1,11 @@
-from typing import Type
+from typing import Type, List, TypeVar
 
 from agile_ai.data_marshalling.directory_path import DirectoryPath
 from agile_ai.injection.interfaces import Service
-from agile_ai.memoization.warehouse_key import ObjectKey
+from agile_ai.memoization.object_option import ObjectOption
+from agile_ai.memoization.warehouse_key import ObjectKey, KeyLiteral, StorageKey
 from agile_ai.memoization.warehouse_object import WarehouseObject
+WarehouseObjectT = TypeVar("WarehouseObjectT", bound=WarehouseObject)
 
 
 class WarehouseService(Service):
@@ -46,8 +48,22 @@ class WarehouseService(Service):
         object_path = self.get_object_path(key)
         return (object_path // "metadata.json").exists()
 
+    def get_object_class_path(self, object_cls_name: str) -> DirectoryPath:
+        return self.warehouse_directory / self.partition_name / object_cls_name
+
     def get_object_path(self, key: ObjectKey) -> DirectoryPath:
-        return self.warehouse_directory / self.partition_name / key.object_cls_name / key.get_key_part().get_storage_string()
+        return self.get_object_class_path(key.object_cls_name) / key.get_key_part().get_storage_string()
+    def get_object_options(self, object_class: Type[WarehouseObjectT]) -> List[ObjectOption[WarehouseObjectT]]:
+        class_directory = self.get_object_class_path(object_class.get_class_name())
+        object_options = []
+        for path in class_directory.path.iterdir():
+            md5_hex = path.name
+            key_part = StorageKey(md5_hex)
+            object_key = ObjectKey(object_class, key_part)
+            object_option = ObjectOption(object_key)
+            object_options.append(object_option)
+        return object_options
+
 
 
 def register_object_class(object_class):
