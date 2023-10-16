@@ -1,5 +1,6 @@
 from typing import List, Callable, Dict, Tuple
 
+from agile_ai.configuration.ingestion_configuration import IngestionConfiguration
 from agile_ai.data_marshalling.file_path import FilePath
 from agile_ai.injection import Marker
 from agile_ai.memoization.md5_helper import Md5Helper
@@ -23,9 +24,10 @@ class FileInfo(WarehouseObject):
 class FileInfoIngestor(Processor):
     __services__: Marker
     md5_helper: Md5Helper
+    ingestion_configuration: IngestionConfiguration
 
     class Inputs(IO):
-        file_path: FilePath
+        file_name: str
 
     class Outputs(IO):
         file_info: ObjectOption[FileInfo]
@@ -35,21 +37,21 @@ class FileInfoIngestor(Processor):
         The full name is the name, followed by key-value pairs
         values may be a dot-seperated list
         """
-        file_name = inputs.file_path.path.parts[-1]
-        extension, key_value_dict = self.parse_key_values(file_name)
+        file_base_name = inputs.file_name.split("/")[-1]
+        extension, key_value_dict = self.parse_key_values(file_base_name)
         if "md5" in key_value_dict:
             md5_hex = "".join(key_value_dict["md5"])
         else:
-            md5_hex = self.md5_helper.digest_file(inputs.file_path)
-        file_info = FileInfo()
+            file_path = self.ingestion_configuration.source_data_directory // inputs.file_name
+            md5_hex = self.md5_helper.digest_file(file_path)
+        key_part = KeyLiteral(md5_hex)
+        outputs.init_options(key_part)
+        file_info = outputs.file_info.object_instance
         file_info.md5_hex = md5_hex
-        file_info.file_name = file_name
+        file_info.file_name = inputs.file_name
         file_info.name = "".join(key_value_dict["name"])
         file_info.extension = extension
         file_info.tags = key_value_dict.get("tags", [])
-        key_part = KeyLiteral(md5_hex)
-        outputs.init_options(key_part)
-        outputs.file_info.set(file_info)
 
     def parse_key_values(self, file_name: str) -> Tuple[str, Dict[str, List[str]]]:
         key_value_dict = dict()

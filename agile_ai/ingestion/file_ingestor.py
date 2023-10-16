@@ -1,5 +1,6 @@
 from typing import Callable
 
+from agile_ai.configuration.ingestion_configuration import IngestionConfiguration
 from agile_ai.data_marshalling import filesystem
 from agile_ai.data_marshalling.file_path import FilePath
 from agile_ai.ingestion.file_info_ingestor import FileInfo, FileInfoIngestor
@@ -20,28 +21,25 @@ class File(WarehouseObject):
     @property
     def path(self) -> FilePath:
         extension = self.file_info.get().extension
-        return self.get_object_path() / f"file.{extension}"
+        return self.get_object_path() // f"file.{extension}"
 
 
 class FileIngestor(Processor):
     __services__: Marker
+    ingestion_configuration: IngestionConfiguration
 
     class Inputs(IO):
-        file_path: FilePath
+        file_info: ObjectOption[FileInfo]
 
     class Outputs(IO):
         file: ObjectOption[File]
 
     def perform(self, inputs: Inputs, outputs: Outputs):
-        file_info_ingester = FileInfoIngestor()
-        file_info_ingester.inputs.file_path = inputs.file_path
-        file_info = file_info_ingester.resolve().file_info
-        file = File()
-        file.file_info = file_info
-        outputs.init_options(file_info.object_key.key_part)
-        outputs.file.set(file)
+        file = outputs.file.object_instance
+        file.file_info = inputs.file_info
         file.get_object_path().ensure_exists()
-        filesystem.copy(inputs.file_path, file.path)
+        file_path = (self.ingestion_configuration.source_data_directory // file.file_info.get().file_name)
+        filesystem.copy(file_path, file.path)
 
     resolve: Callable[..., Outputs]
     inputs: Inputs

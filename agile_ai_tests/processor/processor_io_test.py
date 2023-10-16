@@ -118,15 +118,11 @@ def processor_io_test():
     def _():
         @before_each
         def _(tc: TestContext):
-            tc.outputs.some_output_a = ObjectOption(ObjectKey(SomeOutputA, KeyLiteral("some_key_a")))
-            tc.outputs.some_output_b = ObjectOption(ObjectKey(SomeOutputB, KeyLiteral("some_key_b")))
+            tc.outputs.some_output_a = ObjectOption(SomeOutputA().with_key_part(KeyLiteral("some_key_a")))
+            tc.outputs.some_output_b = ObjectOption(SomeOutputB().with_key_part(KeyLiteral("some_key_b")))
 
         @it("puts all object instances stored in object options")
         def _(tc: TestContext):
-            some_output_a = SomeOutputA()
-            some_output_b = SomeOutputB()
-            tc.outputs.some_output_a.set(some_output_a)
-            tc.outputs.some_output_b.set(some_output_b)
             tc.outputs.store_options()
             expect(tc.warehouse_service.has_object(tc.outputs.some_output_a.object_key)).to_be(True)
             expect(tc.warehouse_service.has_object(tc.outputs.some_output_b.object_key)).to_be(True)
@@ -135,11 +131,7 @@ def processor_io_test():
     def _():
         @it("creates output object options with the specified part key")
         def _(tc: TestContext):
-            some_output_a = SomeOutputA()
-            some_output_b = SomeOutputB()
             tc.outputs.init_options(KeyLiteral("some_shared_key_part"))
-            tc.outputs.some_output_a.set(some_output_a)
-            tc.outputs.some_output_b.set(some_output_b)
             tc.outputs.some_output_a.put()
             tc.outputs.some_output_b.put()
             expect(tc.warehouse_service.has_object(tc.outputs.some_output_a.object_key)).to_be(True)

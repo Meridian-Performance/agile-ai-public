@@ -41,8 +41,7 @@ class ProcessorA(Processor):
         some_output_b: ObjectOption[SomeOutputB]
 
     def perform(self, inputs: Inputs, outputs: Outputs):
-        outputs.some_output_a.set(SomeOutputA())
-        outputs.some_output_b.set(SomeOutputB())
+        pass
 
     inputs: Inputs
     resolve: Callable[..., Outputs]

@@ -51,6 +51,7 @@ class IO:
         for field_name, key_type in self.__annotations__.items():
             if "ObjectOption" in str(key_type):
                 object_cls: Type[WarehouseObject] = key_type.__args__[0]
-                key_value = ObjectOption(object_cls().with_key_part(key_part))
+                object_instance = object_cls().with_key_part(key_part)
+                key_value = ObjectOption(object_instance)
                 setattr(self, field_name, key_value)
 

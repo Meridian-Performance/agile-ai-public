@@ -9,7 +9,7 @@ WarehouseObjectT = TypeVar("WarehouseObjectT", bound=WarehouseObject)
 
 class ObjectOption(Generic[WarehouseObjectT]):
     object_key: ObjectKey
-    object_instance: Optional[WarehouseObject]
+    object_instance: Optional[WarehouseObjectT]
 
     def __init__(self, object_or_key: Union[WarehouseObject, ObjectKey]):
         from agile_ai.memoization.warehouse_service import WarehouseService
@@ -43,9 +43,6 @@ class ObjectOption(Generic[WarehouseObjectT]):
         if not self.object_key.key_part:
             return False
         return True
-
-    def set(self, object_instance: WarehouseObjectT):
-        self.object_instance = object_instance.with_key_part(self.object_key.key_part)
 
     def put(self):
         self.warehouse_service.put_object(self.object_instance)

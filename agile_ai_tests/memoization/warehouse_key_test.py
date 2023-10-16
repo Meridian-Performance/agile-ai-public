@@ -70,6 +70,14 @@ def warehouse_key_test():
     def _():
         @describe("#to_storage")
         def _():
+            @describe("when it has length one")
+            def _():
+                @it("serializes to a tuple with a trailing comma")
+                def _(tc: TestContext):
+                    key_tuple = KeyTuple([KeyLiteral("some_string")])
+                    expect(key_tuple.to_storage()).to_be('("some_string", )')
+
+
             @describe("when it only contain literals")
             def _():
                 @it("serializes the literals as a tuple string")

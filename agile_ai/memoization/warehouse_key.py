@@ -105,7 +105,11 @@ class KeyTuple(KeyPart):
         return KeyTuple(items)
 
     def to_storage(self) -> str:
-        return "(" + ", ".join([key_part.to_storage() for key_part in self.key_parts]) + ")"
+        storage_strings = [key_part.to_storage() for key_part in self.key_parts]
+        if len(storage_strings) == 1:
+            storage_strings.append("")
+
+        return "(" + ", ".join(storage_strings) + ")"
 
 
 def _standardize_key_part(key_part: Union[KeyPart, str]) -> KeyPart:
