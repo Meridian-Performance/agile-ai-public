@@ -35,7 +35,7 @@ class FileIngestor(Processor):
         file: ObjectOption[File]
 
     def perform(self, inputs: Inputs, outputs: Outputs):
-        file = outputs.file.object_instance
+        file = outputs.file()
         file.file_info = inputs.file_info
         file.get_object_path().ensure_exists()
         file_path = (self.ingestion_configuration.source_data_directory // file.file_info.get().file_name)

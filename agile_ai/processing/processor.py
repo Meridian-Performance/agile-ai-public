@@ -1,6 +1,7 @@
 from typing import Type
 
 from agile_ai.injection.decorators import autowire_services
+from agile_ai.injection.interfaces import Service
 from agile_ai.processing.processor_io import IO
 
 

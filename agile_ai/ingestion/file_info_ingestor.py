@@ -46,7 +46,7 @@ class FileInfoIngestor(Processor):
             md5_hex = self.md5_helper.digest_file(file_path)
         key_part = KeyLiteral(md5_hex)
         outputs.init_options(key_part)
-        file_info = outputs.file_info.object_instance
+        file_info = outputs.file_info()
         file_info.md5_hex = md5_hex
         file_info.file_name = inputs.file_name
         file_info.name = "".join(key_value_dict["name"])
