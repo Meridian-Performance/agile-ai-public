@@ -6,3 +6,8 @@ def remove_path(path):
     path = Path(str(path))
     if path.exists():
         shutil.rmtree(path)
+
+
+def copy(src, dest):
+    import shutil
+    shutil.copy(str(src), str(dest))

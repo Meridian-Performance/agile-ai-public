@@ -5,6 +5,7 @@ from agile_ai.injection.interfaces import Service
 from agile_ai.memoization.object_option import ObjectOption
 from agile_ai.memoization.warehouse_key import ObjectKey, KeyLiteral, StorageKey
 from agile_ai.memoization.warehouse_object import WarehouseObject
+
 WarehouseObjectT = TypeVar("WarehouseObjectT", bound=WarehouseObject)
 
 
@@ -53,6 +54,7 @@ class WarehouseService(Service):
 
     def get_object_path(self, key: ObjectKey) -> DirectoryPath:
         return self.get_object_class_path(key.object_cls_name) / key.get_key_part().get_storage_string()
+
     def get_object_options(self, object_class: Type[WarehouseObjectT]) -> List[ObjectOption[WarehouseObjectT]]:
         class_directory = self.get_object_class_path(object_class.get_class_name())
         object_options = []
@@ -64,6 +66,17 @@ class WarehouseService(Service):
             object_options.append(object_option)
         return object_options
 
+
+def set_partition_name(partition_name: str):
+    from agile_ai.injection.decorators import get_service
+    warehouse_service = get_service(WarehouseService)
+    warehouse_service.set_partition_name(partition_name)
+
+
+def set_warehouse_directory(warehouse_directory: DirectoryPath):
+    from agile_ai.injection.decorators import get_service
+    warehouse_service = get_service(WarehouseService)
+    warehouse_service.set_warehouse_directory(warehouse_directory)
 
 
 def register_object_class(object_class):

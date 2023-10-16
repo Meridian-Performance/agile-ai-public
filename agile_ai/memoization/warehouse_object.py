@@ -1,4 +1,5 @@
 from agile_ai.data_marshalling.directory_path import DirectoryPath
+from agile_ai.injection.decorators import get_service
 from agile_ai.memoization.warehouse_key import ObjectKey, KeyPart
 from agile_ai.utilities.introspection import Introspection
 
@@ -86,12 +87,13 @@ class WarehouseObject:
             object_option = ObjectOption(object_key)
             setattr(self, object_name, object_option)
 
-
+    def get_object_path(self) -> DirectoryPath:
+        from agile_ai.memoization.warehouse_service import WarehouseService
+        warehouse_service = get_service(WarehouseService)
+        return warehouse_service.get_object_path(self.get_object_key())
 
     def fetch(self, directory_path):
         pass
 
     def store(self, directory_path):
         pass
-
-

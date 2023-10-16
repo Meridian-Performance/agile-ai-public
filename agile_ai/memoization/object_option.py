@@ -35,6 +35,15 @@ class ObjectOption(Generic[WarehouseObjectT]):
     def get(self) -> WarehouseObjectT:
         return self.warehouse_service.get_object(self.object_key)
 
+    def is_set(self) -> bool:
+        if not self.object_instance:
+            return False
+        if not self.object_key:
+            return False
+        if not self.object_key.key_part:
+            return False
+        return True
+
     def set(self, object_instance: WarehouseObjectT):
         self.object_instance = object_instance.with_key_part(self.object_key.key_part)
 

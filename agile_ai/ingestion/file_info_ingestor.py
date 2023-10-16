@@ -6,6 +6,7 @@ from agile_ai.memoization.md5_helper import Md5Helper
 from agile_ai.memoization.object_option import ObjectOption
 from agile_ai.memoization.warehouse_key import KeyLiteral
 from agile_ai.memoization.warehouse_object import WarehouseObject
+from agile_ai.memoization.warehouse_service import register_object_class
 from agile_ai.processing.processor import Processor
 from agile_ai.processing.processor_io import IO
 
@@ -72,3 +73,6 @@ class FileInfoIngestor(Processor):
 
     resolve: Callable[..., Outputs]
     inputs: Inputs
+
+
+register_object_class(FileInfo)

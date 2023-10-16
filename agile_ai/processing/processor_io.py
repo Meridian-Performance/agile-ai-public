@@ -42,6 +42,8 @@ class IO:
     def store_options(self):
         for field_name, key_type, key_value in self.get_items():
             if isinstance(key_value, ObjectOption):
+                if not key_value.is_set():
+                    raise ValueError(f"Output `{field_name}` ObjectOption of type `{key_type.__args__[0]}` is empty")
                 key_value.put()
 
     def init_options(self, key_part: KeyPart):
