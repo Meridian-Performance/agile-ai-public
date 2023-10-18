@@ -14,7 +14,16 @@ class VideoFrames(WarehouseObject):
     __objects__: Marker
 
     def series_file_path(self, series_name: str, series_index: int) -> FilePath:
-        return self.get_object_path() / series_name // f'{series_index:08d}.{self.extension}'
+        return self.get_series_directory(series_name) // f'{series_index:08d}.{self.extension}'
+
+    def get_series_directory(self, series_name: str):
+        return self.get_object_path() / series_name
+
+    def get_frames_directory(self):
+        return self.get_series_directory("frames")
+
+    def __len__(self):
+        return self.count
 
     def __getitem__(self, index: int) -> np.ndarray:
         return self.series_file_path("frames", index).get()

@@ -1,8 +1,12 @@
+from typing import TypeVar
+
 from agile_ai.data_marshalling.directory_path import DirectoryPath
 from agile_ai.injection.decorators import get_service
 from agile_ai.memoization.warehouse_key import ObjectKey, KeyPart
 from agile_ai.processing.processor_io import ObjectWithOptions
 from agile_ai.utilities.introspection import Introspection
+
+WarehouseObjectT = TypeVar("WarehouseObjectT", bound="WarehouseObject")
 
 
 class WarehouseObject(ObjectWithOptions):
@@ -100,11 +104,11 @@ class WarehouseObject(ObjectWithOptions):
     def store(self, directory_path):
         pass
 
-    def allocate_storage(self):
+    def allocate_storage(self: WarehouseObjectT) -> WarehouseObjectT:
         self.get_object_path().ensure_exists()
         return self
 
-    def put(self):
+    def put(self: WarehouseObjectT) -> WarehouseObjectT:
         from agile_ai.memoization.object_option import ObjectOption
         ObjectOption(self).put()
         return self

@@ -1,10 +1,17 @@
-from typing import Type, Optional
+from typing import Type, Optional, TypeVar
 
 from agile_ai.memoization.warehouse_key import KeyTuple, KeyLiteral, ObjectKey, KeyPart
 from agile_ai.utilities.introspection import Introspection
 
+T = TypeVar("T")
+
 
 class ObjectWithOptions:
+    def get_items(self):
+        for field_name, key_type in Introspection.get_annotation_items(self):
+            key_value = getattr(self, field_name)
+            yield field_name, key_type, key_value
+
     def get_object_options(self):
         for field_name, key_type in Introspection.get_annotation_items(self):
             if Introspection.is_object_option_cls(key_type):
@@ -24,12 +31,11 @@ class ObjectWithOptions:
 
     def store_options(self):
         for field_name, key_type, key_value in self.get_object_options():
-            if not key_value.is_set():
-                raise ValueError(f"Unable to store ObjectOption `{field_name}` of type `{key_type.__args__[0]}`, it is considered 'set'")
+            key_value.assert_set(field_name, key_type)
             key_value.put()
         return self
 
-    def init_options(self, key_part: Optional[KeyPart] = None):
+    def init_options(self: T, key_part: Optional[KeyPart] = None) -> T:
         for field_name, key_type in Introspection.get_annotation_items(self):
             if "ObjectOption" in str(key_type):
                 from agile_ai.memoization.warehouse_object import WarehouseObject
@@ -47,7 +53,7 @@ class IO(ObjectWithOptions):
 
     def get_key(self) -> Optional[KeyTuple]:
         key_list = []
-        for field_name, key_type, key_value in self.get_object_options():
+        for field_name, key_type, key_value in self.get_items():
             if key_type in [str, int, float]:
                 key = KeyLiteral(key_value)
             elif isinstance(key_value, ObjectKey):

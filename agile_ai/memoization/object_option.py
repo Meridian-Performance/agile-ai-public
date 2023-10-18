@@ -34,9 +34,9 @@ class ObjectOption(Generic[WarehouseObjectT]):
         self._object_instance = warehouse_object
 
     def __call__(self, object_instance: Optional[WarehouseObjectT] = None, **kwargs) -> Optional[WarehouseObjectT]:
-        if not self._object_instance:
+        if self._object_instance is None:
             object_class = self.object_key.get_class()
-            object_instance = object_class
+            object_instance = object_class()
         if object_instance:
             self._set_warehouse_object(object_instance)
         return self._object_instance
@@ -55,14 +55,14 @@ class ObjectOption(Generic[WarehouseObjectT]):
     def get(self) -> WarehouseObjectT:
         return self.warehouse_service.get_object(self.object_key)
 
-    def is_set(self) -> bool:
+    def assert_set(self, field_name: str, key_type):
+        base_str = f"ObjectOption `{field_name}` of type `{key_type.__args__[0]}`, it isn't considered 'set'"
         if not self._object_instance:
-            return False
+            raise ValueError(f"{base_str}: object instance is None")
         if not self.object_key:
-            return False
+            raise ValueError(f"{base_str}: object key is None")
         if not self.object_key.key_part:
-            return False
-        return True
+            raise ValueError(f"{base_str}: object key part is None")
 
     def put(self):
         self.warehouse_service.put_object(self._object_instance)
