@@ -26,6 +26,8 @@ class VideoFrames(WarehouseObject):
         return self.count
 
     def __getitem__(self, index: int) -> np.ndarray:
+        if index >= self.count:
+            raise IndexError
         return self.series_file_path("frames", index).get()
 
     def __setitem__(self, index: int, value: np.ndarray):

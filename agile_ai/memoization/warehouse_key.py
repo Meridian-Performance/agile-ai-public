@@ -58,7 +58,7 @@ class KeyLiteral(KeyPart):
         self.literal = literal
 
     def get_storage_string(self):
-        return compute_md5_hex(self.literal)
+        return compute_md5_hex(str(self.literal))
 
     @classmethod
     def from_storage(cls, literal: str):
