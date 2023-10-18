@@ -28,7 +28,24 @@ def video_reader_test():
         def _(tc: TestContext):
             frames = list(tc.video_reader.read())
             expect(frames).to_have_length(25)
-            first_frame = frames[0]
-            expect(first_frame.shape).to_be((128, 256, 3))
-            expect(tuple(first_frame[0, 0])).to_be((125, 0, 0))
+            frame_00 = frames[0]
+            frame_10 = frames[10]
+            frame_20 = frames[20]
+            expect(frame_00.shape).to_be((128, 256, 3))
+            expect(tuple(frame_00[0, 0])).to_be((125, 0, 0))
+            expect(tuple(frame_10[0, 0])).to_be((191, 254, 52))
+            expect(tuple(frame_20[0, 0])).to_be((0, 69, 254))
+
+    @describe("#__getitem__")
+    def _():
+        @it("returns the item")
+        def _(tc: TestContext):
+            frames = tc.video_reader
+            frame_00 = frames[0]
+            frame_20 = frames[20]
+            frame_10 = frames[10]
+            expect(frame_00.shape).to_be((128, 256, 3))
+            expect(tuple(frame_00[0, 0])).to_be((125, 0, 0))
+            expect(tuple(frame_10[0, 0])).to_be((191, 254, 52))
+            expect(tuple(frame_20[0, 0])).to_be((0, 69, 254))
 
