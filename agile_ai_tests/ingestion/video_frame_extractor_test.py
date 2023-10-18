@@ -44,10 +44,10 @@ def video_frame_extractor_test():
         def _(tc: TestContext):
             extractor = VideoFrameExtractor()
             extractor.inputs.video_file(tc.video_file)
+            extractor.inputs.extension = "npz"
             video_frames = extractor.resolve().video_frames.get()
             expect(video_frames.count).to_be(25)
             expect(video_frames.extension).to_be("npz")
             expect(video_frames[0]).to_be_a(np.ndarray)
             expect(video_frames[24]).to_be_a(np.ndarray)
-
 

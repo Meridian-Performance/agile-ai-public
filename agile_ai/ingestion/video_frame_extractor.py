@@ -13,6 +13,7 @@ from agile_ai.video.video_reader import VideoReader
 class VideoFrameExtractor(Processor):
     __services__: Marker
     class Inputs(IO):
+        extension: str
         video_file: ObjectOption[File]
 
     class Outputs(IO):
@@ -24,7 +25,7 @@ class VideoFrameExtractor(Processor):
     def perform(self, inputs: Inputs, outputs: Outputs):
         video_reader = VideoReader(inputs.video_file.get().path)
         video_frames = outputs.video_frames()
-        video_frames.extension = "npz"
+        video_frames.extension = inputs.extension
         index = 0
         for index, frame in enumerate(video_reader):
             video_frames[index] = frame
