@@ -35,5 +35,14 @@ class Introspection:
         except:
             return False
 
+    @staticmethod
+    def is_object_option(object_instance) -> bool:
+        from agile_ai.memoization.object_option import ObjectOption
+        return isinstance(object_instance, ObjectOption)
+
+    @staticmethod
+    def is_object_option_cls(cls) -> bool:
+        return "ObjectOption" in str(cls)
+
 
 

@@ -11,6 +11,7 @@ class Processor:
 
     def __init__(self):
         self.inputs = self.get_inputs_cls()()
+        self.inputs.init_options(None)
         self.initialize_services()
 
     @classmethod

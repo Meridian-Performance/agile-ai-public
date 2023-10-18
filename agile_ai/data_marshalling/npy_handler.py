@@ -31,4 +31,4 @@ class NpyHandler(FileHandler):
     @classmethod
     def matches(cls, filename):
         """Check if filename matches."""
-        return filename.endswith(".npy") or filename.endswith(".npz")
+        return filename.endswith(".npy")

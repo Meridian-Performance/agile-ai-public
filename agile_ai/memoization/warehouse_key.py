@@ -92,6 +92,9 @@ class KeyLiteral(KeyPart):
 class KeyTuple(KeyPart):
 
     def __init__(self, key_parts: List[KeyPart]):
+        for key_part in key_parts:
+            if not isinstance(key_part, KeyPart):
+                raise TypeError(f"key_part `{key_part}` is not actually a KeyPart")
         self.key_parts = key_parts
 
     def get_storage_string(self):
@@ -148,6 +151,8 @@ class ObjectKey(Generic[WarehouseObjectT], KeyPart):
         return self.key_part
 
     def get_key_tuple(self) -> KeyTuple:
+        if self.key_part is None:
+            raise ValueError(f"ObjectKey<{self.object_cls_name}> key_part is None, did you forget to set it?")
         return KeyTuple([self.get_class_key(), self.key_part])
 
     def get_class_key(self) -> KeyPart:

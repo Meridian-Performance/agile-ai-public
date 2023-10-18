@@ -9,7 +9,9 @@ def configure_warehouse(warehouse_directory: Optional[DirectoryPath] = None, par
         set_warehouse_directory(warehouse_directory)
     if partition_name:
         set_partition_name(partition_name)
-    from agile_ai.ingestion.file_info_ingestor import FileInfo
-    from agile_ai.ingestion.file_ingestor import File
+    from agile_ai.models.file_info import FileInfo
+    from agile_ai.models.file import File
+    from agile_ai.models.video_frames import VideoFrames
     register_object_class(FileInfo)
     register_object_class(File)
+    register_object_class(VideoFrames)

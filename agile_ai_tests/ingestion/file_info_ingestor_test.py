@@ -1,5 +1,6 @@
 from agile_ai.configuration.ingestion_configuration import IngestionConfiguration
-from agile_ai.ingestion.file_info_ingestor import FileInfoIngestor, FileInfo
+from agile_ai.ingestion.file_info_ingestor import FileInfoIngestor
+from agile_ai.models.file_info import FileInfo
 from agile_ai.injection.decorators import Marker
 from agile_ai.memoization.warehouse_key import KeyLiteral
 from agile_ai.memoization.warehouse_service import register_object_class

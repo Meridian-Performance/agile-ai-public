@@ -5,19 +5,9 @@ from agile_ai.injection import Marker
 from agile_ai.memoization.md5_helper import Md5Helper
 from agile_ai.memoization.object_option import ObjectOption
 from agile_ai.memoization.warehouse_key import KeyLiteral
-from agile_ai.memoization.warehouse_object import WarehouseObject
-from agile_ai.memoization.warehouse_service import register_object_class
+from agile_ai.models.file_info import FileInfo
 from agile_ai.processing.processor import Processor
 from agile_ai.processing.processor_io import IO
-
-
-class FileInfo(WarehouseObject):
-    __metadata__: Marker
-    md5_hex: str
-    name: str
-    extension: str
-    tags: List[str]
-    file_name: str
 
 
 class FileInfoIngestor(Processor):
@@ -30,6 +20,9 @@ class FileInfoIngestor(Processor):
 
     class Outputs(IO):
         file_info: ObjectOption[FileInfo]
+
+    resolve: Callable[..., Outputs]
+    inputs: Inputs
 
     def perform(self, inputs: Inputs, outputs: Outputs):
         """
@@ -72,8 +65,5 @@ class FileInfoIngestor(Processor):
         key_value_dict[key] = value_parts
         return extension, key_value_dict
 
-    resolve: Callable[..., Outputs]
-    inputs: Inputs
 
 
-register_object_class(FileInfo)

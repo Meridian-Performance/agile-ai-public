@@ -1,10 +1,11 @@
 from agile_ai.data_marshalling.directory_path import DirectoryPath
 from agile_ai.injection.decorators import get_service
 from agile_ai.memoization.warehouse_key import ObjectKey, KeyPart
+from agile_ai.processing.processor_io import ObjectWithOptions
 from agile_ai.utilities.introspection import Introspection
 
 
-class WarehouseObject:
+class WarehouseObject(ObjectWithOptions):
     key_part: KeyPart
 
     def set_key_part(self, key_part: KeyPart):
@@ -101,4 +102,9 @@ class WarehouseObject:
 
     def allocate_storage(self):
         self.get_object_path().ensure_exists()
+        return self
+
+    def put(self):
+        from agile_ai.memoization.object_option import ObjectOption
+        ObjectOption(self).put()
         return self

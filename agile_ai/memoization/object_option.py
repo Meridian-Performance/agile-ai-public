@@ -8,6 +8,12 @@ WarehouseObjectT = TypeVar("WarehouseObjectT", bound=WarehouseObject)
 
 
 class ObjectOption(Generic[WarehouseObjectT]):
+    """
+        An ObjectOption is only considered present if saved to disk
+
+        If it "is_set", it can be saved to disk
+        "put" saves it to disk.
+    """
     object_key: ObjectKey
     _object_instance: Optional[WarehouseObjectT]
 
@@ -15,13 +21,24 @@ class ObjectOption(Generic[WarehouseObjectT]):
         from agile_ai.memoization.warehouse_service import WarehouseService
         self.warehouse_service = get_service(WarehouseService)
         if isinstance(object_or_key, ObjectKey):
-            self.object_key = object_or_key
-            self._object_instance = None
+            self._set_object_key(object_or_key)
         if isinstance(object_or_key, WarehouseObject):
-            self.object_key = object_or_key.get_object_key()
-            self._object_instance = object_or_key
+            self._set_warehouse_object(object_or_key)
 
-    def __call__(self, *args, **kwargs) -> Optional[WarehouseObjectT]:
+    def _set_object_key(self, object_key: ObjectKey):
+        self.object_key = object_key
+        self._object_instance = None
+
+    def _set_warehouse_object(self, warehouse_object: WarehouseObject):
+        self.object_key = warehouse_object.get_object_key()
+        self._object_instance = warehouse_object
+
+    def __call__(self, object_instance: Optional[WarehouseObjectT] = None, **kwargs) -> Optional[WarehouseObjectT]:
+        if not self._object_instance:
+            object_class = self.object_key.get_class()
+            object_instance = object_class
+        if object_instance:
+            self._set_warehouse_object(object_instance)
         return self._object_instance
 
     @staticmethod

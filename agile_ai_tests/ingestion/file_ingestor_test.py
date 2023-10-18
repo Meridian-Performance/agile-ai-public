@@ -1,8 +1,10 @@
 from agile_ai.configuration import configure_warehouse
 from agile_ai.configuration.ingestion_configuration import IngestionConfiguration
 from agile_ai.data_marshalling.file_path import FilePath
-from agile_ai.ingestion.file_info_ingestor import FileInfo, FileInfoIngestor
-from agile_ai.ingestion.file_ingestor import FileIngestor, File
+from agile_ai.ingestion.file_info_ingestor import FileInfoIngestor
+from agile_ai.models.file_info import FileInfo
+from agile_ai.ingestion.file_ingestor import FileIngestor
+from agile_ai.models.file import File
 from agile_ai.injection.decorators import Marker
 from agile_ai.memoization.md5_helper import Md5Helper
 from agile_ai.memoization.object_option import ObjectOption
