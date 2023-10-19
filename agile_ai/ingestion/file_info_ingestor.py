@@ -48,7 +48,7 @@ class FileInfoIngestor(Processor):
     def parse_key_values(self, file_name: str) -> Tuple[str, Dict[str, List[str]]]:
         key_value_dict = dict()
         parts = file_name.split(".")
-        extension = parts[-1]
+        extension = parts[-1].lower()
         parts = parts[:-1]
         value_parts = []
         key = "name"
