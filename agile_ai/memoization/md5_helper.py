@@ -6,5 +6,7 @@ from agile_ai.injection.interfaces import Service
 
 class Md5Helper(Service):
     def digest_file(self, file_path: FilePath) -> str:
-        completed_process = subprocess.run(f"md5sum {file_path}", capture_output=True, shell=True)
-        return completed_process.stdout.decode("U8").split()[0]
+        command_string = f"md5sum '{file_path}'"
+        completed_process = subprocess.run(command_string, capture_output=True, shell=True)
+        output_string = completed_process.stdout.decode("U8")
+        return output_string.split()[0]
