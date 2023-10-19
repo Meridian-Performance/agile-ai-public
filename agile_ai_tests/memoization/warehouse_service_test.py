@@ -5,7 +5,7 @@ from agile_ai.memoization.warehouse_key import ObjectKey, KeyLiteral
 from agile_ai.memoization.warehouse_object import WarehouseObject
 from agile_ai.memoization.warehouse_service import WarehouseService
 from agile_ai_tests.test_helpers.pyne_future import an_existing_path
-from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase
+from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase, fdescribe, fit
 from agile_ai_tests.test_helpers.test_helpers import reset_and_configure_test
 from pynetest.expectations import expect
 from pynetest.pyne_tester import pyne
@@ -41,6 +41,7 @@ class TestContext(TCBase):
     __other__: Marker
     object_key: ObjectKey
     object_path: DirectoryPath
+    other_partition_object_path: DirectoryPath
     warehouse_object: SomeWarehouseObject
 
 
@@ -59,17 +60,18 @@ def warehouse_service_test():
 
     @describe("#set_partition_name")
     def _():
-        @it("...")
+        @it("sets the partition order")
         def _(tc: TestContext):
             tc.warehouse_service.set_partition_name("some_partition_name")
             expect(tc.warehouse_service.partition_name).to_be("some_partition_name")
+            expect(tc.warehouse_service.partition_order).to_be(["some_partition_name"])
 
     @describe("when the warehouse is configured")
     def _():
         @before_each
         def _(tc: TestContext):
             tc.warehouse_service.set_warehouse_directory(tc.test_directory / "some_warehouse_directory")
-            tc.warehouse_service.set_partition_name("some_partition_name")
+            tc.warehouse_service.set_partition_order(["some_partition_name", "some_secondary_partition_name"])
             tc.warehouse_service.register_object_class(SomeWarehouseObject)
 
         @describe("#get_object_path")
@@ -84,6 +86,19 @@ def warehouse_service_test():
                     tc.test_directory / "some_warehouse_directory" / "some_partition_name" / "SomeWarehouseObject" / md5_hex
                 )
 
+            @describe("when the object key has a specific partition name set")
+            def _():
+                @it("return a path with that partition name")
+                def _(tc: TestContext):
+                    key_part = KeyLiteral("some_object_key_part")
+                    object_key = ObjectKey(SomeWarehouseObject, key_part).with_partition_name(
+                        "some_specific_partition_name")
+                    md5_hex = key_part.get_storage_string()
+                    object_directory = tc.warehouse_service.get_object_path(object_key)
+                    expect(object_directory).to_be(
+                        tc.test_directory / "some_warehouse_directory" / "some_specific_partition_name" / "SomeWarehouseObject" / md5_hex
+                    )
+
         @describe("#put_object")
         def _():
             @before_each
@@ -92,7 +107,8 @@ def warehouse_service_test():
                 tc.warehouse_object.some_data = "some_data_value"
                 tc.warehouse_object.some_file_data = "some_file_data_value"
                 tc.warehouse_object.set_key_part(KeyLiteral("some_key_part"))
-                tc.warehouse_object.some_other_object = ObjectOption(ObjectKey(SomeOtherWarehouseObject, KeyLiteral("some_other_object_key")))
+                tc.warehouse_object.some_other_object = ObjectOption(
+                    ObjectKey(SomeOtherWarehouseObject, KeyLiteral("some_other_object_key")))
 
             @it("stores the metadata with the object_key")
             def _(tc: TestContext):
@@ -114,7 +130,6 @@ def warehouse_service_test():
                 other_object_key = ObjectKey(SomeOtherWarehouseObject, KeyLiteral("some_other_object_key"))
                 expect(metadata_dict["some_other_object"]).to_be(other_object_key.to_storage())
 
-
             @it("persists data using stores")
             def _(tc: TestContext):
                 tc.warehouse_service.put_object(tc.warehouse_object)
@@ -129,6 +144,8 @@ def warehouse_service_test():
                 key_part = KeyLiteral("some_object_key_part")
                 tc.object_key = ObjectKey(SomeWarehouseObject, key_part)
                 tc.object_path = tc.warehouse_service.get_object_path(tc.object_key)
+                tc.other_partition_object_path = tc.warehouse_service.get_object_path(
+                    tc.object_key.copy(partition_name="some_other_partition_name"))
 
             @describe("when metadata.json exists at the object path")
             def _():
@@ -142,6 +159,14 @@ def warehouse_service_test():
                 @it("returns False")
                 def _(tc: TestContext):
                     expect(tc.warehouse_service.has_object(tc.object_key)).to_be(False)
+
+                @describe("when a secondary partition is defined and the object exists in that partition")
+                def _():
+                    @it("returns True")
+                    def _(tc: TestContext):
+                        tc.warehouse_service.set_partition_order(["some_partition", "some_other_partition_name"])
+                        (tc.other_partition_object_path // "metadata.json").touch()
+                        expect(tc.warehouse_service.has_object(tc.object_key)).to_be(True)
 
         @describe("#get_object")
         def _():
@@ -176,7 +201,8 @@ def warehouse_service_test():
                     tc.warehouse_object.get_object_key())
                 expect(warehouse_object.some_other_object).to_be_a(ObjectOption)
                 expect(warehouse_object.some_other_object.object_key).to_be_a(ObjectKey)
-                expect(warehouse_object.some_other_object.object_key).to_be(tc.warehouse_object.some_other_object.object_key)
+                expect(warehouse_object.some_other_object.object_key).to_be(
+                    tc.warehouse_object.some_other_object.object_key)
                 expect(warehouse_object.some_other_object.is_present()).to_be(True)
 
             @it("persists data using fetch")
@@ -184,6 +210,24 @@ def warehouse_service_test():
                 warehouse_object: SomeWarehouseObject = tc.warehouse_service.get_object(
                     tc.warehouse_object.get_object_key())
                 expect(warehouse_object.some_file_data).to_be("some_file_data_value")
+
+            @describe("if an object exists only in the secondary partition")
+            def _():
+                @before_each
+                def _(tc: TestContext):
+                    tc.warehouse_object = SomeWarehouseObject()
+                    tc.warehouse_service.register_object_class(SomeOtherWarehouseObject)
+                    tc.warehouse_object.some_data = "some_data_value"
+                    tc.warehouse_object.some_file_data = "some_file_data_value"
+                    tc.warehouse_object.set_key_part(KeyLiteral("some_key_part_in_another_partition"))
+                    some_other_object = SomeOtherWarehouseObject().with_key_part(KeyLiteral("some_other_object_key"))
+                    tc.warehouse_object.some_other_object = ObjectOption(some_other_object)
+                    tc.warehouse_service.put_object(tc.warehouse_object, partition_name="some_secondary_partition_name")
+
+                @it("returns the object in the secondary partition")
+                def _(tc: TestContext):
+                    warehouse_object = tc.warehouse_service.get_object(tc.warehouse_object.get_object_key())
+                    expect(warehouse_object.key_part).to_be(KeyLiteral("some_key_part_in_another_partition"))
 
         @describe("#get_object_options")
         def _():
@@ -210,4 +254,3 @@ def warehouse_service_test():
                 expect(object_options).to_have_length(2)
                 expect(object_options[0]).to_be_a(ObjectOption)
                 expect(object_options[0].get()).to_be_a(SomeWarehouseObject)
-

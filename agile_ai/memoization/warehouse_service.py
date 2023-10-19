@@ -1,4 +1,4 @@
-from typing import Type, List, TypeVar
+from typing import Type, List, TypeVar, Optional
 
 from agile_ai.data_marshalling.directory_path import DirectoryPath
 from agile_ai.injection.interfaces import Service
@@ -10,7 +10,7 @@ WarehouseObjectT = TypeVar("WarehouseObjectT", bound=WarehouseObject)
 
 
 class WarehouseService(Service):
-    partition_name: str
+    partition_order: List[str]
     warehouse_directory: DirectoryPath
 
     def __init__(self):
@@ -23,20 +23,33 @@ class WarehouseService(Service):
         self.warehouse_directory = warehouse_directory
 
     def set_partition_name(self, partition_name: str):
-        self.partition_name = partition_name
+        self.partition_order = [partition_name]
+
+    def set_partition_order(self, partition_order: List[str]):
+        self.partition_order = partition_order
+
+    @property
+    def partition_name(self) -> str:
+        return self.partition_order[0]
 
     @property
     def partition_directory(self) -> DirectoryPath:
         return self.warehouse_directory / self.partition_name
 
-    def put_object(self, object_instance: WarehouseObject):
-        object_path = self.get_object_path(object_instance.get_object_key())
+    def put_object(self, object_instance: WarehouseObject, partition_name: Optional[str] = None):
+        object_key = object_instance.get_object_key()
+        if partition_name:
+            object_key = object_key.copy(partition_name=partition_name)
+        object_path = self.get_object_path(object_key)
         object_instance.save(object_path)
 
     def get_object(self, key: ObjectKey):
         class_name = key.object_cls_name
         object_class = self.lookup_class_by_name(class_name)
-        object_path = self.get_object_path(key)
+        key_with_partition = self.find_object_key_with_partition(key)
+        if key_with_partition is None:
+            raise KeyError(f"Object of class '{class_name}' with key {key} was not found in partitions {self.partition_order}")
+        object_path = self.get_object_path(key_with_partition)
         return object_class.load(object_path)
 
     def lookup_class_by_name(self, class_name: str) -> Type[WarehouseObject]:
@@ -45,18 +58,29 @@ class WarehouseService(Service):
             raise ModuleNotFoundError(f"Unable to lookup class for `{class_name}`, did you register it?")
         return object_class
 
-    def has_object(self, key: ObjectKey):
-        object_path = self.get_object_path(key)
-        return (object_path // "metadata.json").exists()
+    def find_object_key_with_partition(self, key: ObjectKey) -> Optional[ObjectKey]:
+        partition_names = [key.partition_name] if key.partition_name is not None else self.partition_order
+        for partition_name in partition_names:
+            key_with_partition = key.copy(partition_name=partition_name)
+            object_path = self.get_object_path(key_with_partition)
+            if (object_path // "metadata.json").exists():
+                return key_with_partition
+        return None
 
-    def get_object_class_path(self, object_cls_name: str) -> DirectoryPath:
-        return self.warehouse_directory / self.partition_name / object_cls_name
+    def has_object(self, key: ObjectKey):
+        key_with_partition = self.find_object_key_with_partition(key)
+        return key_with_partition is not None
+
+    def get_object_class_path(self, object_key: ObjectKey) -> DirectoryPath:
+        object_cls_name = object_key.object_cls_name
+        partition_name = object_key.partition_name if object_key.partition_name else self.partition_name
+        return self.warehouse_directory / partition_name / object_cls_name
 
     def get_object_path(self, key: ObjectKey) -> DirectoryPath:
-        return self.get_object_class_path(key.object_cls_name) / key.get_key_part().get_storage_string()
+        return self.get_object_class_path(key) / key.get_key_part().get_storage_string()
 
     def get_object_options(self, object_class: Type[WarehouseObjectT]) -> List[ObjectOption[WarehouseObjectT]]:
-        class_directory = self.get_object_class_path(object_class.get_class_name())
+        class_directory = self.get_object_class_path(ObjectKey(object_class, key_part=None))
         object_options = []
         for path in class_directory.path.iterdir():
             md5_hex = path.name

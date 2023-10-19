@@ -1,5 +1,5 @@
 from hashlib import md5
-from typing import Type, List, Tuple, Union, TypeVar, Generic
+from typing import Type, List, Tuple, Union, TypeVar, Generic, Optional
 
 import numpy as np
 
@@ -131,18 +131,34 @@ def key(key_parts: List["KeyPart"]) -> KeyTuple:
 
 WarehouseObjectT = TypeVar("WarehouseObjectT", bound=WarehouseObjectAlias)
 
+T = TypeVar("T")
 
 class ObjectKey(Generic[WarehouseObjectT], KeyPart):
     object_cls: Type[WarehouseObjectAlias]
     key_part: KeyPart
     object_cls_name: str
+    partition_name: Optional[str]
 
-    def __init__(self, object_cls: Type[WarehouseObjectAlias], key_part: KeyPart, object_cls_name=None):
+    def __init__(self, object_cls: Type[WarehouseObjectAlias], key_part: KeyPart, object_cls_name=None, partition_name: Optional[str]=None):
         self.object_cls = object_cls
         if not object_cls_name:
             object_cls_name = Introspection.get_class_name(object_cls)
         self.object_cls_name = object_cls_name
         self.key_part = key_part
+        self.partition_name = partition_name
+
+    def copy(self: Type[T], partition_name: Optional[str] = None, key_part: Optional[KeyPart] = None) -> T:
+        key_copy = ObjectKey(object_cls=self.object_cls,
+                             object_cls_name=self.object_cls_name,
+                             key_part=self.key_part,
+                             partition_name=self.partition_name
+                             )
+        if partition_name:
+            key_copy.partition_name = partition_name
+        if key_part:
+            key_copy.key_part = key_part
+        return key_copy
+
 
     def get_storage_string(self):
         return self.get_key_tuple().get_storage_string()
@@ -177,6 +193,10 @@ class ObjectKey(Generic[WarehouseObjectT], KeyPart):
         if not isinstance(other, ObjectKey):
             return False
         return self.to_storage() == other.to_storage()
+
+    def with_partition_name(self, partition_name: str):
+        self.partition_name = partition_name
+        return self
 
 
 class StorageKey(KeyPart):
