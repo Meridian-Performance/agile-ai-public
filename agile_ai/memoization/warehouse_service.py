@@ -80,14 +80,22 @@ class WarehouseService(Service):
         return self.get_object_class_path(key) / key.get_key_part().get_storage_string()
 
     def get_object_options(self, object_class: Type[WarehouseObjectT]) -> List[ObjectOption[WarehouseObjectT]]:
-        class_directory = self.get_object_class_path(ObjectKey(object_class, key_part=None))
+        key_set = set()
         object_options = []
-        for path in class_directory.path.iterdir():
-            md5_hex = path.name
-            key_part = StorageKey(md5_hex)
-            object_key = ObjectKey(object_class, key_part)
-            object_option = ObjectOption(object_key)
-            object_options.append(object_option)
+        for partition_name in self.partition_order:
+            class_directory = self.get_object_class_path(ObjectKey(object_class, partition_name=partition_name, key_part=None))
+            if not class_directory.exists():
+                continue
+            for path in class_directory.path.iterdir():
+                md5_hex = path.name
+                key_part = StorageKey(md5_hex)
+                object_key = ObjectKey(object_class, key_part)
+                key = object_key.to_storage()
+                if key in key_set:
+                    continue
+                key_set.add(key)
+                object_option = ObjectOption(object_key)
+                object_options.append(object_option)
         return object_options
 
 
