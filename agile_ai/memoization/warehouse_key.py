@@ -200,7 +200,7 @@ class ObjectKey(Generic[WarehouseObjectT], KeyPart):
         return self
 
     def __repr__(self):
-        return f'ObjectKey<{self.to_storage()}>'
+        return f'ObjectKey<{self.get_storage_string()}>'
 
     def __str__(self):
         return repr(self)
