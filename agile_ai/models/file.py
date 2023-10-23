@@ -30,6 +30,7 @@ class File(WarehouseObject):
         return self
 
     def with_extension(self, extension: str):
+        self.extension = extension
         self.file_info().extension = extension
         return self
 
