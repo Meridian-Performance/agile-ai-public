@@ -228,6 +228,7 @@ def warehouse_service_test():
                 def _(tc: TestContext):
                     warehouse_object = tc.warehouse_service.get_object(tc.warehouse_object.get_object_key())
                     expect(warehouse_object.key_part).to_be(KeyLiteral("some_key_part_in_another_partition"))
+                    expect(str(warehouse_object.get_object_path())).to_contain("secondary")
 
         @describe("#get_object_options")
         def _():

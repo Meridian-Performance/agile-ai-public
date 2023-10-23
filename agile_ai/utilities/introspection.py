@@ -2,14 +2,13 @@
 class Introspection:
     @staticmethod
     def get_annotations(cls):
+        if not hasattr(cls, "__annotations__"):
+            return dict()
         return cls.__annotations__
 
     @staticmethod
     def get_annotation_items(cls):
-        if not hasattr(cls, "__annotations__"):
-            return []
-        else:
-            return cls.__annotations__.items()
+        return Introspection.get_annotations(cls).items()
 
     @staticmethod
     def get_marker_groups(cls):

@@ -1,4 +1,4 @@
-from typing import TypeVar
+from typing import TypeVar, Optional
 
 from agile_ai.data_marshalling.directory_path import DirectoryPath
 from agile_ai.injection.decorators import get_service
@@ -10,18 +10,25 @@ WarehouseObjectT = TypeVar("WarehouseObjectT", bound="WarehouseObject")
 
 
 class WarehouseObject(ObjectWithOptions):
-    key_part: KeyPart
 
     def set_key_part(self, key_part: KeyPart):
-        self.key_part = key_part
+        self.object_key.key_part = key_part
         return self
 
     def with_key_part(self, key_part: KeyPart):
         self.set_key_part(key_part)
         return self
 
-    def __init__(self):
-        self.key_part = None
+    def with_partition_name(self, partition_name: str):
+        self.object_key.with_partition_name(partition_name)
+        return self
+
+    @property
+    def key_part(self) -> KeyPart:
+        return self.object_key.key_part
+
+    def __init__(self, key_part: Optional[KeyPart] = None, partition_name: Optional[str] = None):
+        self.object_key = ObjectKey(self.get_class(), key_part, partition_name=partition_name)
 
     def _copy_metadata(self, source_dict: dict, destination_dict: dict):
         cls = self.get_class()
@@ -35,7 +42,9 @@ class WarehouseObject(ObjectWithOptions):
         return destination_dict
 
     def get_metadata_dict(self) -> dict:
-        return self._copy_metadata(self.__dict__, destination_dict=dict())
+        source_dict = dict(self.__dict__)
+        source_dict["key_part"] = self.key_part
+        return self._copy_metadata(source_dict, destination_dict=dict())
 
     def set_metadata_dict(self, metadata_dict):
         self._copy_metadata(metadata_dict, self.__dict__)
@@ -48,20 +57,22 @@ class WarehouseObject(ObjectWithOptions):
     def get_class_name(cls):
         return Introspection.get_class_name(cls)
 
-    def get_object_key(self) -> ObjectKey:
-        return ObjectKey(self.get_class(), self.key_part)
+    def get_object_key(self, partition_name: Optional[str] = None) -> ObjectKey:
+        return self.object_key.with_partition_name(partition_name)
 
     @classmethod
-    def load(cls, directory_path: DirectoryPath):
+    def load(cls: WarehouseObjectT, object_key: ObjectKey):
+        class_instance: WarehouseObjectT = cls(object_key.key_part, object_key.partition_name)
+        directory_path = class_instance.get_object_path()
         metadata_dict = (directory_path // "metadata.json").get()
         metadata_dict["key_part"] = KeyPart.from_storage(metadata_dict["key_part"])
-        class_instance = cls()
         class_instance.set_metadata_dict(metadata_dict)
         class_instance.fetch(directory_path)
         class_instance.copy_object_keys_from_metadata(metadata_dict)
         return class_instance
 
-    def save(self, directory_path: DirectoryPath):
+    def save(self, object_key: ObjectKey):
+        directory_path = self.get_object_path(object_key)
         metadata_dict = self.get_metadata_dict()
         metadata_dict["key_part"] = metadata_dict["key_part"].to_storage()
         metadata_dict["class_name"] = self.get_class_name()
@@ -93,10 +104,12 @@ class WarehouseObject(ObjectWithOptions):
             object_option = ObjectOption(object_key)
             setattr(self, object_name, object_option)
 
-    def get_object_path(self) -> DirectoryPath:
+    def get_object_path(self, object_key: Optional[ObjectKey] = None) -> DirectoryPath:
         from agile_ai.memoization.warehouse_service import WarehouseService
         warehouse_service = get_service(WarehouseService)
-        return warehouse_service.get_object_path(self.get_object_key())
+        if object_key is None:
+           object_key = self.get_object_key()
+        return warehouse_service.get_object_path(object_key)
 
     def fetch(self, directory_path):
         pass

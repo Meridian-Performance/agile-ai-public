@@ -195,7 +195,8 @@ class ObjectKey(Generic[WarehouseObjectT], KeyPart):
         return self.to_storage() == other.to_storage()
 
     def with_partition_name(self, partition_name: str):
-        self.partition_name = partition_name
+        if partition_name:
+            self.partition_name = partition_name
         return self
 
 

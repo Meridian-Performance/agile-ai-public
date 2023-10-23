@@ -37,11 +37,7 @@ class WarehouseService(Service):
         return self.warehouse_directory / self.partition_name
 
     def put_object(self, object_instance: WarehouseObject, partition_name: Optional[str] = None):
-        object_key = object_instance.get_object_key()
-        if partition_name:
-            object_key = object_key.copy(partition_name=partition_name)
-        object_path = self.get_object_path(object_key)
-        object_instance.save(object_path)
+        object_instance.save(object_instance.get_object_key(partition_name))
 
     def get_object(self, key: ObjectKey):
         class_name = key.object_cls_name
@@ -49,8 +45,7 @@ class WarehouseService(Service):
         key_with_partition = self.find_object_key_with_partition(key)
         if key_with_partition is None:
             raise KeyError(f"Object of class '{class_name}' with key {key} was not found in partitions {self.partition_order}")
-        object_path = self.get_object_path(key_with_partition)
-        return object_class.load(object_path)
+        return object_class.load(key_with_partition)
 
     def lookup_class_by_name(self, class_name: str) -> Type[WarehouseObject]:
         object_class = self.object_class_by_name.get(class_name)
