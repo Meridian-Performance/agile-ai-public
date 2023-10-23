@@ -9,13 +9,20 @@ from agile_ai.models.file_info import FileInfo
 
 class File(WarehouseObject):
     __metadata__: Marker
+    extension: str
 
     __objects__: Marker
     file_info: ObjectOption[FileInfo]
 
+    def get_extension(self):
+        if hasattr(self, "extension") and self.extension:
+            return self.extension
+        else:
+            return self.file_info.get().extension
+
     @property
     def path(self) -> FilePath:
-        extension = self.file_info.get().extension
+        extension = self.get_extension()
         return self.get_object_path() // f"file.{extension}"
 
     def copy_from_file_path(self, source_file_path: FilePath):
