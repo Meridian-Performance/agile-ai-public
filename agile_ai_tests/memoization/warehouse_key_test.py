@@ -1,5 +1,5 @@
 from agile_ai.injection.decorators import Marker
-from agile_ai.memoization.warehouse_key import ObjectKey, KeyTuple, KeyLiteral
+from agile_ai.memoization.warehouse_key import ObjectKey, KeyTuple, KeyLiteral, StorageKey
 from agile_ai.memoization.warehouse_object import WarehouseObject
 from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase
 from agile_ai_tests.test_helpers.test_helpers import reset_and_configure_test
@@ -162,3 +162,13 @@ def warehouse_key_test():
                     expect(object_key.object_cls_name).to_be("SomeWarehouseObject")
                     expect(object_key.key_part).to_be_a(ObjectKey)
                     expect(object_key.key_part.object_cls_name).to_be("SomeWarehouseObject")
+
+    @describe("StorageKey")
+    def _():
+        @describe("#to_storage")
+        def _():
+            @it("serializes it as quoted string")
+            def _(tc: TestContext):
+                object_key = ObjectKey(SomeWarehouseObject, StorageKey("some_md5_key"))
+                expect(object_key.to_storage()).to_be('["SomeWarehouseObject", "some_md5_key"]')
+

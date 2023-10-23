@@ -199,6 +199,12 @@ class ObjectKey(Generic[WarehouseObjectT], KeyPart):
             self.partition_name = partition_name
         return self
 
+    def __repr__(self):
+        return f'ObjectKey<{self.to_storage()}>'
+
+    def __str__(self):
+        return repr(self)
+
 
 class StorageKey(KeyPart):
     def __init__(self, md5_hex: str):
@@ -212,7 +218,7 @@ class StorageKey(KeyPart):
         raise NotImplementedError
 
     def to_storage(self) -> str:
-        return self.md5_hex
+        return f'"{self.md5_hex}"'
 
     def __eq__(self, other):
         if not isinstance(other, StorageKey):
@@ -221,3 +227,6 @@ class StorageKey(KeyPart):
 
     def __repr__(self):
         return f'StorageKey<{self.md5_hex}>'
+
+    def __str__(self):
+        return repr(self)
