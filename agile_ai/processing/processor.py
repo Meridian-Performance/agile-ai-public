@@ -2,6 +2,7 @@ from typing import Type
 
 from agile_ai.injection.decorators import autowire_services
 from agile_ai.processing.processor_io import IO
+from agile_ai.utilities.introspection import Introspection
 
 
 class Processor:
@@ -35,8 +36,12 @@ class Processor:
 
     def resolve(self) -> IO:
         outputs = self._get_outputs(self.inputs)
-        if outputs.has_options() and outputs.all_options_present():
+        class_name = Introspection.get_class_name(self.__class__)
+        print(f"<{class_name}> Checking outputs")
+        if outputs.has_options() and outputs.all_options_present(status_log=True):
+            print(f"<{class_name}> Resolved: all options present")
             return outputs
+        print(f"<{class_name}> Not resolved: calling perform")
         return self.perform_super(self.inputs)
 
     @classmethod

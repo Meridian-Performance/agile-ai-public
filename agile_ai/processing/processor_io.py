@@ -23,9 +23,11 @@ class ObjectWithOptions:
             return True
         return False
 
-    def all_options_present(self) -> bool:
+    def all_options_present(self, status_log=False) -> bool:
         for field_name, key_type, key_value in self.get_object_options():
             if key_value.is_empty():
+                if status_log:
+                    print(f"  All options present check: field `{field_name}` of type `{key_type}` is empty")
                 return False
         return True
 
@@ -66,10 +68,12 @@ class IO(ObjectWithOptions):
             key_list.append(key)
         return KeyTuple(key_list)
 
-    def all_options_present(self) -> bool:
+    def all_options_present(self, status_log=False) -> bool:
         if self.key_part is None:
+            if status_log:
+                print("  All options present check: Key part is not sent")
             return False
-        return ObjectWithOptions.all_options_present(self)
+        return ObjectWithOptions.all_options_present(self, status_log=status_log)
 
     def init_options(self, key_part: Optional[KeyPart] = None):
         self.key_part = key_part
