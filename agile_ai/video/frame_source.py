@@ -14,10 +14,10 @@ class FrameSource:
         self.frames = frames
         return self
 
-    def populate_frames(self):
+    def populate_frames(self, ext="png"):
         for i, frame in enumerate(self.frames):
             print("Saving frame", i)
-            (self.frame_directory // f"frame_{i:008d}.png").put(frame)
+            (self.frame_directory // f"frame_{i:008d}.{ext}").put(frame)
 
     def get_input_path(self):
         self.populate_frames()
