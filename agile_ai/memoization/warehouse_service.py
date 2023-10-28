@@ -84,7 +84,7 @@ class WarehouseService(Service):
             for path in class_directory.path.iterdir():
                 md5_hex = path.name
                 key_part = StorageKey(md5_hex)
-                object_key = ObjectKey(object_class, key_part)
+                object_key = ObjectKey(object_class, key_part, partition_name=partition_name)
                 key = object_key.to_storage()
                 if key in key_set:
                     continue
