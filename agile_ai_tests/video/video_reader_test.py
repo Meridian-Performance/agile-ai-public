@@ -1,5 +1,5 @@
 from agile_ai.injection.decorators import Marker
-from agile_ai.video.video_reader import VideoReader
+from agile_ai.video.video_reader import VideoReader, ColorType
 from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase
 from agile_ai_tests.test_helpers.test_helpers import reset_and_configure_test, resources_directory
 from pynetest.expectations import expect
@@ -21,7 +21,8 @@ def video_reader_test():
     @before_each(TestContext)
     def _(tc: TestContext):
         reset_and_configure_test()
-        tc.video_reader = VideoReader(resources_directory / "mp4" // "jet_colors_25.mp4")
+        tc.video_reader = VideoReader(resources_directory / "mp4" // "jet_colors_25.mp4", output_color=ColorType.BGR)
+
     @describe("#read")
     def _():
         @it("reads all frames")
@@ -49,3 +50,14 @@ def video_reader_test():
             expect(tuple(frame_10[0, 0])).to_be((191, 254, 52))
             expect(tuple(frame_20[0, 0])).to_be((0, 69, 254))
 
+
+    @describe("when the output color is specified")
+    def _():
+        @before_each
+        def _(tc: TestContext):
+            tc.video_reader = VideoReader(resources_directory / "mp4" // "jet_colors_25.mp4", output_color=ColorType.RGB)
+
+        @it("converts frames to that color")
+        def _(tc: TestContext):
+            frame_20 = tc.video_reader.get_frame(20)
+            expect(tuple(frame_20[0, 0])).to_be((254, 69, 0))
