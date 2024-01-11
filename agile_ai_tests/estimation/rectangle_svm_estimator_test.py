@@ -1,9 +1,9 @@
 import numpy as np
-
 from agile_ai.estimation.embedded_svm_estimator import SvmExemplars
 from agile_ai.estimation.rectangle_svm_estimator import RectangleSvmEstimator
+
 from agile_ai.injection.decorators import Marker
-from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase, xit
+from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, TCBase, xit
 from agile_ai_tests.test_helpers.test_helpers import reset_and_configure_test
 from pynetest.pyne_tester import pyne
 from pynetest.test_doubles.stub import MegaStub
