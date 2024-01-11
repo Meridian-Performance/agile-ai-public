@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import os
 from pathlib import Path
 from typing import Union
 
@@ -39,3 +42,7 @@ class DirectoryPath(PathLike):
         if not isinstance(other, DirectoryPath):
             return False
         return self.path == other.path
+
+    @staticmethod
+    def home() -> DirectoryPath:
+        return DirectoryPath(os.environ["HOME"])

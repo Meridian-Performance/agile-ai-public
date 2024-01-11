@@ -6,7 +6,7 @@ import pylab
 from agile_ai.data_marshalling.file_path import FilePath
 from agile_ai.injection.decorators import Marker
 from agile_ai.video.frame_source import FrameSource
-from agile_ai.video.video_reader import VideoReader
+from agile_ai.video.video_reader import VideoReader, ColorType
 from agile_ai.video.video_writer import VideoWriter
 from agile_ai_tests.test_helpers.pyne_future import an_existing_path
 from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, TCBase, describe, it
@@ -52,7 +52,7 @@ def video_writer_test():
         def _(tc: TestContext):
             tc.video_writer.write()
             expect(tc.output_path).to_be(an_existing_path())
-            video_reader = VideoReader(tc.output_path)
+            video_reader = VideoReader(tc.output_path, output_color=ColorType.BGR)
             frames = list(video_reader.read())
             expect(frames).to_have_length(25)
             first_frame = frames[0]

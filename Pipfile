@@ -21,11 +21,12 @@ pyyaml = "*"
 # scikit-image = "*"
 imageio = {extras = ["pyav"], version = "*"}
 pyrr = "*"
+scikit-learn = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.8"
+python_version = "3.9"
 
 [scripts]
 setup = "./scripts/setup.py"
