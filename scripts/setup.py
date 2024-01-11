@@ -10,7 +10,7 @@ echo
 
 mkdir -p libraries
 mkdir -p repos
-git submodule add ssh://git@github.com/avvir/pyne repos/pynetest
+git submodule add ssh://git@github.com/kedifei/agile-ai-pyne repos/pynetest
 git submodule update --init
 echo
 echo "******************************************************************"
