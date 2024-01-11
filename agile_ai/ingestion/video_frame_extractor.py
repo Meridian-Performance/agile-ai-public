@@ -1,9 +1,8 @@
-from typing import List, Callable, Dict, Tuple
+from typing import Callable
 
-from agile_ai.models.file import File
 from agile_ai.injection import Marker
 from agile_ai.memoization.object_option import ObjectOption
-from agile_ai.models.file_info import FileInfo
+from agile_ai.models.file import File
 from agile_ai.models.video_frames import VideoFrames
 from agile_ai.processing.processor import Processor
 from agile_ai.processing.processor_io import IO
