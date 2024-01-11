@@ -30,8 +30,8 @@ jobs:
          # PYNE_SSH_KEY is the name of the repository secret
          echo "${{ secrets.PYNE_SSH_KEY }}" > /home/runner/.ssh/pyne_github_runner
          chmod 600 /home/runner/.ssh/pyne_github_runner
-         ssh-agent -a $SSH_AUTH_SOCK > /dev/null	
-         ssh-add /home/runner/.ssh/github_action
+         # ssh-agent -a $SSH_AUTH_SOCK > /dev/null	
+         # ssh-add /home/runner/.ssh/github_action
     
     - name: Install dependencies
       run: |
