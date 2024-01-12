@@ -1,3 +1,3 @@
 [submodule "repos/pynetest"]
 	path = repos/pynetest
-	url = ssh://git@github.com/avvir/pyne
+	url = ssh://git@github.com/Meridian-Performance/agile-ai-pyne
