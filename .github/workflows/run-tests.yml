@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   build:
-
+    name: Python tests
     runs-on: ubuntu-latest
 
     steps:
