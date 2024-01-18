@@ -41,7 +41,9 @@ class ProcessorA(Processor):
         some_output_b: ObjectOption[SomeOutputB]
 
     def perform(self, inputs: Inputs, outputs: Outputs):
-        pass
+        # This automatically initializes the output object, and keys it on the input
+        some_output_a = outputs.some_output_a()
+        some_output_b = outputs.some_output_b()
 
     inputs: Inputs
     resolve: Callable[..., Outputs]
@@ -59,8 +61,9 @@ class TestContext(TCBase):
     inputs: ProcessorA.Inputs
     processor: ProcessorA
 
+
 @pyne
-def processing_test():
+def processor_test():
     @before_each(TestContext)
     def _(tc: TestContext):
         reset_and_configure_test()
@@ -75,6 +78,9 @@ def processing_test():
         inputs.some_input_a = ObjectOption(some_input_a)
         inputs.some_input_b = ObjectOption(some_input_b)
         tc.inputs = inputs
+        # This is required to get the object
+        tc.warehouse_service.register_object_class(SomeOutputA)
+        tc.warehouse_service.register_object_class(SomeOutputB)
 
     @describe("#perform (super)")
     def _():
@@ -117,3 +123,14 @@ def processing_test():
                 outputs = tc.processor.resolve()
                 expect(outputs).to_be_a(ProcessorA.Outputs)
                 expect(tc.processor.perform).was_called()
+
+            @it("sets the outputs keyed on the input")
+            def _(tc: TestContext):
+                outputs = tc.processor.resolve()
+                expect(outputs).to_be_a(ProcessorA.Outputs)
+                expect(outputs.some_output_a).to_be_a(ObjectOption)
+                expect(outputs.some_output_b).to_be_a(ObjectOption)
+                expect(outputs.some_output_a.get()).to_be_a(SomeOutputA)
+                expect(outputs.some_output_b.get()).to_be_a(SomeOutputB)
+                expect(outputs.some_output_a.object_key.get_key_part()).to_be(tc.processor.inputs.get_key())
+                expect(outputs.some_output_b.object_key.get_key_part()).to_be(tc.processor.inputs.get_key())

@@ -1,4 +1,5 @@
 
+
 class Introspection:
     @staticmethod
     def get_annotations(cls):
@@ -41,7 +42,18 @@ class Introspection:
 
     @staticmethod
     def is_object_option_cls(cls) -> bool:
-        return "ObjectOption" in str(cls)
+        cls_str = str(cls)
+        return "ObjectOption" in cls_str or "StreamOption" in cls_str
+
+    @staticmethod
+    def get_object_option_cls(cls_type):
+        cls_str = str(cls_type)
+        from agile_ai.memoization.object_option import ObjectOption
+        from agile_ai.processing.stream_object import StreamOption
+        if "StreamOption" in cls_str:
+            return StreamOption
+        if "ObjectOption" in cls_str:
+            return ObjectOption
 
 
 

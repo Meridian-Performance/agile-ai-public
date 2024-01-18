@@ -16,6 +16,7 @@ class ObjectOption(Generic[WarehouseObjectT]):
     """
     object_key: ObjectKey
     _object_instance: Optional[WarehouseObjectT]
+    memoize: bool
 
     def __init__(self, object_or_key: Union[WarehouseObject, ObjectKey]):
         from agile_ai.memoization.warehouse_service import WarehouseService
@@ -24,6 +25,7 @@ class ObjectOption(Generic[WarehouseObjectT]):
             self._set_object_key(object_or_key)
         if isinstance(object_or_key, WarehouseObject):
             self._set_warehouse_object(object_or_key)
+        self.memoize = True
 
     def _set_object_key(self, object_key: ObjectKey):
         self.object_key = object_key
@@ -33,12 +35,13 @@ class ObjectOption(Generic[WarehouseObjectT]):
         self.object_key = warehouse_object.get_object_key()
         self._object_instance = warehouse_object
 
-    def __call__(self, object_instance: Optional[WarehouseObjectT] = None, **kwargs) -> Optional[WarehouseObjectT]:
+    def __call__(self, object_instance: Optional[WarehouseObjectT] = None, memoize=True, **kwargs) -> Optional[WarehouseObjectT]:
         if self._object_instance is None:
             object_class = self.object_key.get_class()
             object_instance = object_class()
         if object_instance:
             self._set_warehouse_object(object_instance)
+        self.memoize = memoize
         return self._object_instance
 
     @staticmethod
@@ -65,5 +68,6 @@ class ObjectOption(Generic[WarehouseObjectT]):
             raise ValueError(f"{base_str}: object key part is None")
 
     def put(self):
-        self.warehouse_service.put_object(self._object_instance)
+        if self.memoize:
+            self.warehouse_service.put_object(self._object_instance)
         return self
