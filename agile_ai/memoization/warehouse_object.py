@@ -125,3 +125,6 @@ class WarehouseObject(ObjectWithOptions):
         from agile_ai.memoization.object_option import ObjectOption
         ObjectOption(self).put()
         return self
+
+    def configure(self, **kwargs):
+        pass
