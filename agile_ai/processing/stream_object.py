@@ -26,8 +26,12 @@ class StreamObject(WarehouseObject, Generic[StreamElementT]):
         super().__init__(key_part, partition_name)
         self.generator = None
         self.memoize = True
-        self.extension = "pkl"
+        self.extension = self.get_extension()
         self.count = -1
+
+    @classmethod
+    def get_extension(cls):
+        return "pkl"
 
     def consume(self):
         for element in self.stream():
@@ -60,8 +64,10 @@ class StreamObject(WarehouseObject, Generic[StreamElementT]):
     def set_generator(self, generator: Iterable[StreamElementT]):
         self.generator = generator
 
-    def configure(self, memoize: bool = False):
+    def configure(self, memoize: bool = False, extension: str = None):
         self.memoize = memoize
+        if extension:
+            self.extension = extension;
 
     def get_element_path(self, index: int) -> FilePath:
         return self.get_object_path() // f"element_{index:06d}.{self.extension}"
