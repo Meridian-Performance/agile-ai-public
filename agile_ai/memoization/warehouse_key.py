@@ -114,6 +114,10 @@ class KeyTuple(KeyPart):
 
         return "(" + ", ".join(storage_strings) + ")"
 
+    def __eq__(self, other):
+        if other is not None and not isinstance(other, KeyTuple):
+            return False
+        return self.to_storage() == other.to_storage()
 
 def _standardize_key_part(key_part: Union[KeyPart, str]) -> KeyPart:
     if isinstance(key_part, str):

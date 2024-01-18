@@ -39,12 +39,12 @@ class ObjectWithOptions:
 
     def init_options(self: T, key_part: Optional[KeyPart] = None) -> T:
         for field_name, key_type in Introspection.get_annotation_items(self):
-            if "ObjectOption" in str(key_type):
+            ObjectOptionCls = Introspection.get_object_option_cls(key_type)
+            if ObjectOptionCls:
                 from agile_ai.memoization.warehouse_object import WarehouseObject
                 object_cls: Type[WarehouseObject] = key_type.__args__[0]
                 object_instance = object_cls().with_key_part(key_part)
-                from agile_ai.memoization.object_option import ObjectOption
-                key_value = ObjectOption(object_instance)
+                key_value = ObjectOptionCls(object_instance)
                 setattr(self, field_name, key_value)
         return self
 
@@ -63,8 +63,7 @@ class IO(ObjectWithOptions):
             elif Introspection.is_object_option(key_value):
                 key = key_value.object_key
             else:
-                return None
-                # raise NotImplementedError(f"Unhandled key_type {key_type}")
+                print(f"Warning, unhandled key_type {key_type} excluded from key list")
             key_list.append(key)
         return KeyTuple(key_list)
 
