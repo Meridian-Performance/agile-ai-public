@@ -52,6 +52,9 @@ class VideoReader:
     def __iter__(self):
         return self
 
+    def stream(self) -> Iterable:
+        return self
+
     def read(self) -> Iterable:
         return self
 
