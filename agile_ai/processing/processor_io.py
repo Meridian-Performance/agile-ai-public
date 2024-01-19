@@ -56,7 +56,7 @@ class IO(ObjectWithOptions):
     def get_key(self) -> Optional[KeyTuple]:
         key_list = []
         for field_name, key_type, key_value in self.get_items():
-            if key_type in [str, int, float]:
+            if key_type in [str, int, float, bool]:
                 key = KeyLiteral(key_value)
             elif isinstance(key_value, ObjectKey):
                 key = key_value

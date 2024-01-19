@@ -22,17 +22,23 @@ class AttentionEstimator(Service):
 
     def estimate_centers(self, mask: Bool2D, patch_size: int, suppression_size: int, min_energy: int):
         sum_image = self.sum_filter(mask, patch_size)
-        sum_image[sum_image < min_energy] = 0
-        R, C = sum_image.nonzero()
-        V  = sum_image[R, C]
+        return self.extract_peaks(sum_image, suppression_size, min_energy)
+
+    def extract_peaks(self, energy_image, suppression_size: int, min_energy: int, max_peak_count: int = np.inf):
+        energy_image[energy_image < min_energy] = 0
+        R, C = energy_image.nonzero()
+        V  = energy_image[R, C]
         asort = V.argsort()[::-1]
         V = V[asort]
         R = R[asort]
         C = C[asort]
         centers = []
         for v, r, c in zip(V, R, C):
-            if not sum_image[r, c]:
+            if not energy_image[r, c]:
                 continue
             centers.append((c, r))
-            sum_image[r-suppression_size:r+suppression_size+1, c-suppression_size:c+suppression_size+1] = 0
+            if len(centers) > max_peak_count:
+                break
+            slc = slice(max(0, r-suppression_size), r+suppression_size+1), slice(max(0, c-suppression_size), c+suppression_size+1)
+            energy_image[slc] = 0
         return np.array(centers)
