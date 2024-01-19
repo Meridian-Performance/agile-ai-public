@@ -12,6 +12,7 @@ class ColorType(Enum):
     RGB = "RGB"
     BGR = "BGR"
     GRAY = "GRAY"
+    LAB = "LAB"
 
     @staticmethod
     def get_convert_type(source: "ColorType", destination: "ColorType"):
