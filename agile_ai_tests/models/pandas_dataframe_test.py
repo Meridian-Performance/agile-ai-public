@@ -3,6 +3,7 @@ import pandas as pd
 
 from agile_ai.injection.decorators import autowire_services, Marker
 from agile_ai.memoization.warehouse_key import KeyLiteral
+from agile_ai.memoization.warehouse_service import get_object, set_partition_name, register_object_class
 from agile_ai.models.pandas_dataframe import PandasDataframe
 from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase
 from agile_ai_tests.test_helpers.test_helpers import reset_and_configure_test
@@ -24,7 +25,8 @@ class TestContext(TCBase):
 def pandas_dataframe_test():
     @before_each(TestContext)
     def _(tc: TestContext):
-        reset_and_configure_test()
+        reset_and_configure_test(configure_warehouse=True)
+        register_object_class(PandasDataframe)
         tc.dataframe = pd.DataFrame(dict(some_values=np.arange(5)))
 
     @describe("When the object is stored")
@@ -37,6 +39,8 @@ def pandas_dataframe_test():
 
         @it("can be retrieved")
         def _(tc: TestContext):
-            pdf = get_object()
+            pdf = get_object(PandasDataframe, KeyLiteral("some_key_part"))
+            expect(pdf.path.get()).to_be_a(pd.DataFrame)
+
 
 

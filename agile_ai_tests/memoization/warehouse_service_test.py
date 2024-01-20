@@ -4,8 +4,9 @@ from agile_ai.memoization.object_option import ObjectOption
 from agile_ai.memoization.warehouse_key import ObjectKey, KeyLiteral
 from agile_ai.memoization.warehouse_object import WarehouseObject
 from agile_ai.memoization.warehouse_service import WarehouseService
+from agile_ai.utilities.option import Option
 from agile_ai_tests.test_helpers.pyne_future import an_existing_path
-from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase
+from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase, fdescribe, fit
 from agile_ai_tests.test_helpers.test_helpers import reset_and_configure_test
 from pynetest.expectations import expect
 from pynetest.pyne_tester import pyne
@@ -137,6 +138,34 @@ def warehouse_service_test():
                 expect(object_directory // "some_file.json").to_be(an_existing_path())
                 expect((object_directory // "some_file.json").get()).to_be("some_file_data_value")
 
+            @describe("when an ObjectOption is an empty ObjectOption")
+            def _():
+                @before_each
+                def _(tc: TestContext):
+                    tc.warehouse_object.some_other_object = ObjectOption.empty()
+
+                @it("stores the metadata with the reference to be None")
+                def _(tc: TestContext):
+                    tc.warehouse_service.put_object(tc.warehouse_object)
+                    object_directory = tc.warehouse_service.get_object_path(tc.warehouse_object.get_object_key())
+                    metadata_path = object_directory // "metadata.json"
+                    metadata_dict = metadata_path.get()
+                    expect(metadata_dict["some_other_object"]).to_be(None)
+
+            @describe("when an ObjectOption is unset")
+            def _():
+                @before_each
+                def _(tc: TestContext):
+                    del tc.warehouse_object.some_other_object
+
+                @it("stores the metadata with the reference to be None")
+                def _(tc: TestContext):
+                    tc.warehouse_service.put_object(tc.warehouse_object)
+                    object_directory = tc.warehouse_service.get_object_path(tc.warehouse_object.get_object_key())
+                    metadata_path = object_directory // "metadata.json"
+                    metadata_dict = metadata_path.get()
+                    expect(metadata_dict["some_other_object"]).to_be(None)
+
         @describe("#has_object")
         def _():
             @before_each
@@ -229,6 +258,19 @@ def warehouse_service_test():
                     warehouse_object = tc.warehouse_service.get_object(tc.warehouse_object.get_object_key())
                     expect(warehouse_object.key_part).to_be(KeyLiteral("some_key_part_in_another_partition"))
                     expect(str(warehouse_object.get_object_path())).to_contain("secondary")
+
+            @describe("when an ObjectKey is None")
+            def _():
+                @before_each
+                def _(tc: TestContext):
+                    del tc.warehouse_object.some_other_object
+                    tc.warehouse_service.put_object(tc.warehouse_object)
+
+                @fit("sets the corresponding ObjectOption to be empty")
+                def _(tc: TestContext):
+                    warehouse_object: SomeWarehouseObject = tc.warehouse_service.get_object(
+                        tc.warehouse_object.get_object_key())
+                    expect(warehouse_object.some_other_object.is_empty()).to_be(True)
 
         @describe("#get_object_options")
         def _():

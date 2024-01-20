@@ -48,6 +48,8 @@ class ObjectOption(Generic[WarehouseObjectT]):
         return ObjectOption[WarehouseObjectT](object_key)
 
     def is_present(self) -> bool:
+        if self.object_key is None:
+            return False
         return self.warehouse_service.has_object(self.object_key)
 
     def is_empty(self) -> bool:
@@ -68,3 +70,9 @@ class ObjectOption(Generic[WarehouseObjectT]):
     def put(self):
         self.warehouse_service.put_object(self._object_instance)
         return self
+
+    @classmethod
+    def empty(cls):
+        empty_option = ObjectOption(None)
+        empty_option.object_key = None
+        return empty_option
