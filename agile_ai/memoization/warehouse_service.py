@@ -1,9 +1,10 @@
 from typing import Type, List, TypeVar, Optional
 
 from agile_ai.data_marshalling.directory_path import DirectoryPath
+from agile_ai.injection.decorators import get_service
 from agile_ai.injection.interfaces import Service
 from agile_ai.memoization.object_option import ObjectOption
-from agile_ai.memoization.warehouse_key import ObjectKey, StorageKey
+from agile_ai.memoization.warehouse_key import ObjectKey, StorageKey, KeyPart
 from agile_ai.memoization.warehouse_object import WarehouseObject
 
 WarehouseObjectT = TypeVar("WarehouseObjectT", bound=WarehouseObject)
@@ -44,7 +45,8 @@ class WarehouseService(Service):
         object_class = self.lookup_class_by_name(class_name)
         key_with_partition = self.find_object_key_with_partition(key)
         if key_with_partition is None:
-            raise KeyError(f"Object of class '{class_name}' with key {key} was not found in partitions {self.partition_order}")
+            raise KeyError(
+                f"Object of class '{class_name}' with key {key} was not found in partitions {self.partition_order}")
         return object_class.load(key_with_partition)
 
     def lookup_class_by_name(self, class_name: str) -> Type[WarehouseObject]:
@@ -78,7 +80,8 @@ class WarehouseService(Service):
         key_set = set()
         object_options = []
         for partition_name in self.partition_order:
-            class_directory = self.get_object_class_path(ObjectKey(object_class, partition_name=partition_name, key_part=None))
+            class_directory = self.get_object_class_path(
+                ObjectKey(object_class, partition_name=partition_name, key_part=None))
             if not class_directory.exists():
                 continue
             for path in class_directory.path.iterdir():
@@ -110,3 +113,8 @@ def register_object_class(object_class):
     from agile_ai.injection.decorators import get_service
     warehouse_service = get_service(WarehouseService)
     warehouse_service.register_object_class(object_class)
+
+
+def get_object(object_class: Type[WarehouseObject], key_part: KeyPart) -> WarehouseObjectT:
+    warehouse_service = get_service(WarehouseService)
+    return warehouse_service.get_object(ObjectKey(object_class, key_part))
