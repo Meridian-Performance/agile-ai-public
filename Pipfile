@@ -22,6 +22,8 @@ pyyaml = "*"
 imageio = {extras = ["pyav"], version = "*"}
 pyrr = "*"
 scikit-learn = "*"
+pandas = "*"
+pyarrow = "*"
 
 [dev-packages]
 

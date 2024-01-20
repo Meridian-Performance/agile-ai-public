@@ -50,6 +50,7 @@ def add_handlers():
     from agile_ai.data_marshalling.npz_handler import NpzHandler
     from agile_ai.data_marshalling.csv_handler import CsvHandler
     from agile_ai.data_marshalling.image_handler import ImageHandler
+    from agile_ai.data_marshalling.parquet_handler import ParquetHandler
     FilePath.add_handler(TxtHandler)
     FilePath.add_handler(ObjHandler)
     FilePath.add_handler(PklHandler)
@@ -59,6 +60,7 @@ def add_handlers():
     FilePath.add_handler(NpzHandler)
     FilePath.add_handler(CsvHandler)
     FilePath.add_handler(ImageHandler)
+    FilePath.add_handler(ParquetHandler)
 
 
 add_handlers()
