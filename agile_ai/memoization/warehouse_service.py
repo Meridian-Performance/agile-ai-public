@@ -1,4 +1,4 @@
-from typing import Type, List, TypeVar, Optional
+from typing import Type, List, TypeVar, Optional, overload
 
 from agile_ai.data_marshalling.directory_path import DirectoryPath
 from agile_ai.injection.decorators import get_service
@@ -115,6 +115,21 @@ def register_object_class(object_class):
     warehouse_service.register_object_class(object_class)
 
 
-def get_object(object_class: Type[WarehouseObject], key_part: KeyPart) -> WarehouseObjectT:
+@overload
+def get_object(object_class: Type[WarehouseObject], key_part: KeyPart) -> WarehouseObjectT: ...
+
+
+@overload
+def get_object(object_key: ObjectKey[WarehouseObjectT]) -> WarehouseObjectT: ...
+
+
+def get_object(*args):
+    if len(args) == 1:
+        object_key = args[0]
+    elif len(args) == 2:
+        object_class, key_part = args
+        object_key = ObjectKey(object_class, key_part)
+    else:
+        raise NotImplementedError(f"get_object expected 1 or 2 arguments, got {args}")
     warehouse_service = get_service(WarehouseService)
-    return warehouse_service.get_object(ObjectKey(object_class, key_part))
+    return warehouse_service.get_object(object_key)

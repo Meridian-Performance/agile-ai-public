@@ -193,6 +193,10 @@ class ObjectKey(Generic[WarehouseObjectT], KeyPart):
         key_part = KeyPart.from_storage(key_part)
         return ObjectKey(object_cls=None, key_part=key_part, object_cls_name=object_cls_name)
 
+    @staticmethod
+    def from_key_part_storage(object_cls, key_part_storage_string: str):
+        return ObjectKey(object_cls, StorageKey(KeyPart.from_storage(key_part_storage_string).literal))
+
     def __eq__(self, other):
         if not isinstance(other, ObjectKey):
             return False
