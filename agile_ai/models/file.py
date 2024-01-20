@@ -20,6 +20,12 @@ class File(WarehouseObject):
         else:
             return self.file_info.get().extension
 
+    def save_file(self, object_to_save):
+        self.path.put(object_to_save)
+
+    def load_file(self):
+        return self.path.get()
+
     @property
     def path(self) -> FilePath:
         extension = self.get_extension()
