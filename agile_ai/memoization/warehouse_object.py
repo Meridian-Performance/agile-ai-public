@@ -91,8 +91,11 @@ class WarehouseObject(ObjectWithOptions):
         from agile_ai.memoization.object_option import ObjectOption
         object_names = self.get_object_attribute_names()
         for object_name in object_names:
-            object_option: ObjectOption = getattr(self, object_name)
-            object_key = object_option.object_key.to_storage()
+            object_option: ObjectOption = getattr(self, object_name, ObjectOption.empty())
+            if object_option.object_key is None:
+                object_key = None
+            else:
+                object_key = object_option.object_key.to_storage()
             metadata_dict[object_name] = object_key
 
     def copy_object_keys_from_metadata(self, metadata_dict):
@@ -100,8 +103,11 @@ class WarehouseObject(ObjectWithOptions):
         object_names = self.get_object_attribute_names()
         for object_name in object_names:
             value = metadata_dict[object_name]
-            object_key = ObjectKey.from_storage(value)
-            object_option = ObjectOption(object_key)
+            if value is None:
+                object_option = ObjectOption.empty()
+            else:
+                object_key = ObjectKey.from_storage(value)
+                object_option = ObjectOption(object_key)
             setattr(self, object_name, object_option)
 
     def get_object_path(self, object_key: Optional[ObjectKey] = None) -> DirectoryPath:

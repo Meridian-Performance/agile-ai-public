@@ -3,9 +3,9 @@ from agile_ai.models.file import File
 
 
 class PandasDataframe(File):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.extension = "parquet"
-        super().__init__()
 
 
 register_object_class(PandasDataframe)
