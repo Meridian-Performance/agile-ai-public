@@ -20,6 +20,5 @@ class FrameSource:
             (self.frame_directory // f"frame_{i:008d}.{ext}").put(frame)
 
     def get_input_path(self):
-        self.populate_frames()
         input_path = self.frame_directory // "frame_%08d.png"
         return input_path

@@ -34,14 +34,15 @@ class Processor:
     def perform(self, inputs, outputs):
         raise NotImplementedError
 
-    def resolve(self) -> IO:
+    def resolve(self, use_memo=True) -> IO:
         outputs = self._get_outputs(self.inputs)
         class_name = Introspection.get_class_name(self.__class__)
-        print(f"<{class_name}> Checking outputs")
-        if outputs.has_options() and outputs.all_options_present(status_log=True):
-            print(f"<{class_name}> Resolved: all options present")
-            return outputs
-        print(f"<{class_name}> Not resolved: calling perform")
+        if use_memo:
+            print(f"<{class_name}> Checking outputs")
+            if outputs.has_options() and outputs.all_options_present(status_log=True):
+                print(f"<{class_name}> Resolved: all options present")
+                return outputs
+            print(f"<{class_name}> Not resolved: calling perform")
         return self.perform_super(self.inputs)
 
     @classmethod
