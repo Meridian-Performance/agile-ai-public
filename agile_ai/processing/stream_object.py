@@ -6,11 +6,9 @@ from agile_ai.injection.decorators import autowire
 from agile_ai.memoization.object_option import ObjectOption, WarehouseObjectT
 from agile_ai.memoization.warehouse_key import KeyPart
 from agile_ai.memoization.warehouse_object import WarehouseObject
-from agile_ai.memoization.warehouse_service import WarehouseService
+from agile_ai.memoization.warehouse_service import WarehouseService, register_object_class
 
 StreamElementT = TypeVar('StreamElementT')
-
-
 
 
 class StreamObject(WarehouseObject, Generic[StreamElementT]):
@@ -44,7 +42,10 @@ class StreamObject(WarehouseObject, Generic[StreamElementT]):
             else:
                 index = -1
                 for index, element in enumerate(self.generator):
-                    yield self.put_element(index, element)
+                    if element is None:
+                        yield None
+                    else:
+                        yield self.put_element(index, element)
                 self.count = index + 1
                 self.warehouse_service.put_object(self)
         else:
@@ -71,6 +72,9 @@ class StreamObject(WarehouseObject, Generic[StreamElementT]):
 
     def get_element_path(self, index: int) -> FilePath:
         return self.get_object_path() // f"element_{index:06d}.{self.extension}"
+
+
+register_object_class(StreamObject)
 
 
 class StreamOption(ObjectOption[WarehouseObjectT]):
