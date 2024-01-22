@@ -133,3 +133,22 @@ def get_object(*args):
         raise NotImplementedError(f"get_object expected 1 or 2 arguments, got {args}")
     warehouse_service = get_service(WarehouseService)
     return warehouse_service.get_object(object_key)
+
+@overload
+def has_object(object_class: Type[WarehouseObject], key_part: KeyPart) -> WarehouseObjectT: ...
+
+
+@overload
+def has_object(object_key: ObjectKey[WarehouseObjectT]) -> WarehouseObjectT: ...
+
+
+def has_object(*args):
+    if len(args) == 1:
+        object_key = args[0]
+    elif len(args) == 2:
+        object_class, key_part = args
+        object_key = ObjectKey(object_class, key_part)
+    else:
+        raise NotImplementedError(f"has_object expected 1 or 2 arguments, got {args}")
+    warehouse_service = get_service(WarehouseService)
+    return warehouse_service.has_object(object_key)

@@ -222,8 +222,8 @@ class StorageKey(KeyPart):
         return self.md5_hex
 
     @classmethod
-    def from_storage(cls, md5_hex: str):
-        raise NotImplementedError
+    def from_storage(cls, key_part_storage_string: str):
+        return StorageKey(KeyPart.from_storage(key_part_storage_string).literal)
 
     def to_storage(self) -> str:
         return f'"{self.md5_hex}"'
