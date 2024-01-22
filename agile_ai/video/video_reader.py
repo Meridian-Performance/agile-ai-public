@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Iterable, Union
 
 import cv2
+import numpy as np
 
 from agile_ai.data_marshalling.file_path import FilePath
 
@@ -43,12 +44,27 @@ class VideoReader:
         self.video_capture.release()
         self.video_capture = cv2.VideoCapture(self.path)
 
-    def __next__(self):
+    def compute_count(self) -> int:
+        self.reset()
+        try:
+            self.seek(np.inf)
+        except StopIteration:
+            pass
+        count = self.next_index - 1
+        self.reset()
+        return count
+
+    def read_next(self, discard=False):
         success, image = self.video_capture.read()
         self.next_index += 1
         if not success:
             raise StopIteration
+        if discard:
+            return None
         return ColorType.convert(image, self.source_color, self.output_color)
+
+    def __next__(self):
+        return self.read_next()
 
     def __iter__(self):
         return self
@@ -65,7 +81,7 @@ class VideoReader:
         if self.next_index > index:
             self.reset()
         while self.next_index < index:
-            next(self)
+            self.read_next(discard=True)
 
     def get_frame(self, index: int):
         self.seek(index)
