@@ -266,7 +266,7 @@ def warehouse_service_test():
                     del tc.warehouse_object.some_other_object
                     tc.warehouse_service.put_object(tc.warehouse_object)
 
-                @fit("sets the corresponding ObjectOption to be empty")
+                @it("sets the corresponding ObjectOption to be empty")
                 def _(tc: TestContext):
                     warehouse_object: SomeWarehouseObject = tc.warehouse_service.get_object(
                         tc.warehouse_object.get_object_key())
