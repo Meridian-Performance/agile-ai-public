@@ -44,6 +44,7 @@ def video_writer_test():
         colors = (np.array(jet(np.linspace(0, 1, 25)))[:, :3] * 255).astype(np.uint8)
         frame_list = [get_color_square(c) for c in colors]
         tc.frame_source = FrameSource(frame_directory).with_frames(frame_list)
+        tc.frame_source.populate_frames()
         tc.video_writer = VideoWriter(tc.output_path, tc.frame_source)
 
     @describe("#write")
