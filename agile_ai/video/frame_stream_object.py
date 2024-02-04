@@ -19,7 +19,8 @@ class FrameStreamObject(StreamObject):
         return element
 
     def get_input_path(self):
-        self.consume()
+        if self.generator:
+            self.consume()
         return self.get_object_path() // f"element_%06d.{self.get_extension()}"
 
 

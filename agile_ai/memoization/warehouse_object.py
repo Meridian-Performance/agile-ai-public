@@ -1,6 +1,7 @@
 from typing import TypeVar, Optional
 
 from agile_ai.data_marshalling.directory_path import DirectoryPath
+from agile_ai.data_marshalling.file_path import FilePath
 from agile_ai.injection.decorators import get_service
 from agile_ai.memoization.warehouse_key import ObjectKey, KeyPart
 from agile_ai.processing.processor_io import ObjectWithOptions
@@ -80,7 +81,6 @@ class WarehouseObject(ObjectWithOptions):
         directory_path.ensure_exists()
         (directory_path // "metadata.json").put(metadata_dict)
         self.store(directory_path)
-
     def get_object_attribute_names(self):
         cls = self.get_class()
         marker_groups = Introspection.get_marker_groups(cls)
