@@ -90,3 +90,6 @@ class VideoReader:
     @lru_cache(maxsize=5)
     def __getitem__(self, index: int):
         return self.get_frame(index)
+
+    def get_element(self, index: int):
+        return self.get_frame(index)

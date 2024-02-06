@@ -59,8 +59,11 @@ class StreamObject(WarehouseObject, Generic[StreamElementT]):
         self.get_element_path(index).put(element)
         return element
 
-    def get_element(self, index: int) -> StreamElementT:
-        return self.get_element_path(index).get()
+    def get_element(self, index: int, check=False) -> StreamElementT:
+        path = self.get_element_path(index)
+        if check and not path.exists():
+            return None
+        return path.get()
 
     def set_generator(self, generator: Iterable[StreamElementT]):
         self.generator = generator
