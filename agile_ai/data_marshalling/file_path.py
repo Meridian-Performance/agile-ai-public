@@ -42,24 +42,27 @@ class FilePath(PathLike):
 
 def add_handlers():
     from agile_ai.data_marshalling.txt_handler import TxtHandler
-    from agile_ai.data_marshalling.obj_handler import ObjHandler
-    from agile_ai.data_marshalling.pkl_handler import PklHandler
-    from agile_ai.data_marshalling.yaml_handler import YamlHandler
-    from agile_ai.data_marshalling.json_handler import JsonHandler
-    from agile_ai.data_marshalling.npy_handler import NpyHandler
-    from agile_ai.data_marshalling.npz_handler import NpzHandler
-    from agile_ai.data_marshalling.csv_handler import CsvHandler
-    from agile_ai.data_marshalling.image_handler import ImageHandler
-    from agile_ai.data_marshalling.parquet_handler import ParquetHandler
     FilePath.add_handler(TxtHandler)
+    from agile_ai.data_marshalling.obj_handler import ObjHandler
     FilePath.add_handler(ObjHandler)
+    from agile_ai.data_marshalling.pkl_handler import PklHandler
     FilePath.add_handler(PklHandler)
-    FilePath.add_handler(YamlHandler)
+    try:
+        from agile_ai.data_marshalling.yaml_handler import YamlHandler
+        FilePath.add_handler(YamlHandler)
+    except ModuleNotFoundError:
+        print("Unable to import YamlHandler, pyyaml module not found")
+    from agile_ai.data_marshalling.json_handler import JsonHandler
     FilePath.add_handler(JsonHandler)
+    from agile_ai.data_marshalling.npy_handler import NpyHandler
     FilePath.add_handler(NpyHandler)
+    from agile_ai.data_marshalling.npz_handler import NpzHandler
     FilePath.add_handler(NpzHandler)
+    from agile_ai.data_marshalling.csv_handler import CsvHandler
     FilePath.add_handler(CsvHandler)
+    from agile_ai.data_marshalling.image_handler import ImageHandler
     FilePath.add_handler(ImageHandler)
+    from agile_ai.data_marshalling.parquet_handler import ParquetHandler
     FilePath.add_handler(ParquetHandler)
 
 
