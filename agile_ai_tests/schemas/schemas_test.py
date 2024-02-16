@@ -39,7 +39,7 @@ def schemas_test():
         tc.some_schema = SomeSchema(pd.DataFrame(data=dict(
             label=[f"{i}_label" for i in range(5)],
             some_int=np.arange(5, dtype=int),
-            some_float=np.arange(5, dtype=int),
+            some_float=np.arange(5, dtype=float),
             some_bool=np.arange(5, dtype=int) % 2 == 0
         )))
 
@@ -75,3 +75,23 @@ def schemas_test():
             expect(sorted_schema).to_be_a(SomeSchema)
             expect(sorted_schema.some_int.array).to_be(exactly_equal_to_array(tc.some_schema.df.sort_values(by="some_int").some_int.array))
 
+    @describe(":from_columns")
+    def _():
+        @it("creates the df with columns in order as defined by the annotation")
+        def _(tc: TestContext):
+            some_schema = SomeSchema.from_columns([f"{i}_label" for i in range(5)], np.arange(5, dtype=int), np.arange(5, dtype=float), np.arange(5, dtype=int) % 2 == 0)
+            expect(some_schema.label[0]).to_be_a(str)
+            expect(some_schema.some_float[0]).to_be_a(float)
+            expect(some_schema.some_int[0]).to_be_a(np.int64)
+            expect(some_schema.some_bool[0]).to_be_a(np.bool_)
+
+    @describe(":zeros")
+    def _():
+        @it("creates the df with columns in order as defined by the annotation")
+        def _(tc: TestContext):
+            some_schema = SomeSchema.zeros(5)
+            expect(some_schema).to_have_length(5)
+            expect(some_schema.label[0]).to_be_a(str)
+            expect(some_schema.some_float[0]).to_be_a(float)
+            expect(some_schema.some_int[0]).to_be_a(np.int64)
+            expect(some_schema.some_bool[0]).to_be_a(np.bool_)
