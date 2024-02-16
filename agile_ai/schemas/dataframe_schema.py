@@ -1,3 +1,7 @@
+from __future__ import annotations
+from typing import Type, TypeVar
+
+import numpy as np
 import pandas as pd
 from pyarrow import Schema
 
@@ -49,3 +53,21 @@ class DataframeSchema(pd.DataFrame):
                 results = cls(results)
             return results
         return wrapper
+
+    @classmethod
+    def from_columns(cls: Type[SchemaType], *columns) -> SchemaType:
+        df_dict = {}
+        for (column_name, column_type), column in zip(cls.__annotations__.items(), columns):
+            df_dict[column_name] = column
+        return cls(pd.DataFrame.from_dict(df_dict))
+
+    @classmethod
+    def zeros(cls: Type[SchemaType], length: int) -> SchemaType:
+        df_dict = {}
+        for column_name, column_type in cls.__annotations__.items():
+            df_dict[column_name] = np.zeros(length, dtype=column_type.df_type)
+        return cls(pd.DataFrame.from_dict(df_dict))
+
+
+
+SchemaType = TypeVar("SchemaType", bound=DataframeSchema)
