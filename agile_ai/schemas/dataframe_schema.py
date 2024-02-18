@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Type, TypeVar
+from typing import Type, TypeVar, List
 
 import numpy as np
 import pandas as pd
@@ -53,6 +53,10 @@ class DataframeSchema(pd.DataFrame):
                 results = cls(results)
             return results
         return wrapper
+
+    @classmethod
+    def get_column_names(cls) -> List[str]:
+        return list(cls.__annotations__.keys())
 
     @classmethod
     def from_columns(cls: Type[SchemaType], *columns) -> SchemaType:
