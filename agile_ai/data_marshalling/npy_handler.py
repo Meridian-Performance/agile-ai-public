@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import numpy as np
 
 from agile_ai.data_marshalling.file_handler import FileHandler
 
@@ -21,10 +20,12 @@ class NpyHandler(FileHandler):
     @classmethod
     def load(cls, path: Path, **kwargs):
         mmap_mode = cls.determine_mmap_mode(**kwargs)
+        import numpy as np
         return np.load(str(path), encoding="bytes", mmap_mode=mmap_mode)
 
     @classmethod
     def save(cls, path: Path, object_to_save, **kwargs):
+        import numpy as np
         np.save(str(path), object_to_save)
 
 

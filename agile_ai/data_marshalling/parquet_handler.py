@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import pandas as pd
 
 from agile_ai.data_marshalling.file_handler import FileHandler
 
@@ -10,6 +9,7 @@ class ParquetHandler(FileHandler):
 
     @classmethod
     def load(cls, path: Path):
+        import pandas as pd
         return pd.read_parquet(str(path))
 
     @classmethod
