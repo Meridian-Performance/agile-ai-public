@@ -35,16 +35,16 @@ class VideoInfoIngestor(Processor):
         md5_hex = file.file_info.get().md5_hex
         file_reader = VideoReader(file.path)
         frame_count = 0
+        width = 0
+        height = 0
         for frame in file_reader:
             frame_count += 1
             width = frame.shape[1]
             height = frame.shape[0]
 
-        key_part = KeyLiteral(md5_hex)
-        video_info = VideoInfo().with_key_part(key_part)
+        video_info = outputs.video_info()
         video_info.md5_hex = md5_hex
         video_info.frame_count = frame_count
         video_info.width = width
         video_info.height = height
-        outputs.video_info(video_info)
 

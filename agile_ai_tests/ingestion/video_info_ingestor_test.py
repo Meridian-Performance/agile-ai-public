@@ -53,6 +53,7 @@ def video_info_ingestor_test():
         def _(tc: TestContext):
             ingestor = VideoInfoIngestor()
             ingestor.inputs.file = tc.file_option
+            expect(ingestor.is_resolved()).to_be(False)
             outputs = ingestor.resolve()
             expect(outputs.video_info.is_present()).to_be(True)
             video_info = outputs.video_info.get()
@@ -60,4 +61,4 @@ def video_info_ingestor_test():
             expect(video_info.height).to_be(128)
             expect(video_info.width).to_be(256)
             expect(video_info.frame_count).to_be(25)
-
+            expect(ingestor.is_resolved()).to_be(True)
