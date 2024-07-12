@@ -30,7 +30,7 @@ class FileIngestor(Processor):
         file.file_info = inputs.file_info
         file.get_object_path().ensure_exists()
         base_directory = inputs.base_directory if inputs.base_directory else self.ingestion_configuration.source_data_directory
-        file_path = (base_directory // file.file_info.get().file_name)
+        file_path = (DirectoryPath(base_directory) // file.file_info.get().file_name)
         file.copy_from_file_path(file_path)
 
 
