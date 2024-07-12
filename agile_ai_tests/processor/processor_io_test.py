@@ -1,10 +1,13 @@
+from typing import Union
+
+from agile_ai.data_marshalling.directory_path import DirectoryPath
 from agile_ai.injection.decorators import Marker
 from agile_ai.memoization.object_option import ObjectOption
-from agile_ai.memoization.warehouse_key import KeyTuple, ObjectKey, KeyLiteral
+from agile_ai.memoization.warehouse_key import KeyTuple, ObjectKey, KeyLiteral, ExcludedKey
 from agile_ai.memoization.warehouse_object import WarehouseObject
 from agile_ai.memoization.warehouse_service import WarehouseService
 from agile_ai.processing.processor_io import IO
-from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase
+from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase, fit
 from agile_ai_tests.test_helpers.test_helpers import reset_and_configure_test
 from pynetest.expectations import expect
 from pynetest.pyne_tester import pyne
@@ -33,7 +36,10 @@ class Inputs(IO):
     some_string_parameter: str
     some_float_parameter: float
     some_int_parameter: int
-
+    some_included_union: Union[str, DirectoryPath]
+    some_excluded_union: Union[str, ExcludedKey] = None
+    some_excluded_invalid_parameter: DirectoryPath = None
+    some_excluded_invalid_union_parameter: Union[int, DirectoryPath] = None
 
 class Outputs(IO):
     some_output_a: ObjectOption[SomeOutputA]
@@ -68,6 +74,7 @@ def processor_io_test():
         inputs.some_string_parameter = "some_string"
         inputs.some_float_parameter = 4.0
         inputs.some_int_parameter = 1
+        inputs.some_included_union = "some_union_string"
         tc.inputs = inputs
         tc.outputs = Outputs()
 
@@ -77,14 +84,33 @@ def processor_io_test():
         def _(tc: TestContext):
             key_tuple = tc.inputs.get_key()
             expect(key_tuple).to_be_a(KeyTuple)
-            expect(key_tuple.key_parts).to_have_length(5)
+            expect(key_tuple.key_parts).to_have_length(6)
             expect(key_tuple.key_parts[0]).to_be_a(ObjectKey)
             expect(key_tuple.key_parts[1]).to_be_a(ObjectKey)
             expect(key_tuple.key_parts[2]).to_be_a(KeyLiteral)
             expect(key_tuple.key_parts[3]).to_be_a(KeyLiteral)
             expect(key_tuple.key_parts[4]).to_be_a(KeyLiteral)
+            expect(key_tuple.key_parts[5]).to_be_a(KeyLiteral)
             expect(key_tuple.to_storage()).to_be(
-                '(["SomeInputA", "some_key_a"], ["SomeInputB", "some_key_b"], "some_string", "float:4.0", "int:1")')
+                '(["SomeInputA", "some_key_a"], ["SomeInputB", "some_key_b"], "some_string", "float:4.0", "int:1", "some_union_string")')
+
+        @describe("when the input has non-primitive types in a string union")
+        def _():
+            @before_each
+            def _(tc: TestContext):
+                tc.inputs.some_included_union = DirectoryPath("/some_union_string_directory")
+                tc.inputs.some_excluded_key = "some_excluded_key"
+                tc.inputs.some_excluded_invalid_parameter = DirectoryPath("/some_excluded_invalid_parameter")
+                tc.inputs.some_excluded_invalid_union_parameter = DirectoryPath("/some_excluded_invalid_union_parameter")
+
+            @it("concatenates included unions as strings, ignores excluded ones")
+            def _(tc: TestContext):
+                key_tuple = tc.inputs.get_key()
+                expect(key_tuple).to_be_a(KeyTuple)
+                expect(key_tuple.key_parts).to_have_length(6)
+                expect(key_tuple.key_parts[5]).to_be_a(KeyLiteral)
+                expect(key_tuple.to_storage()).to_be(
+                    '(["SomeInputA", "some_key_a"], ["SomeInputB", "some_key_b"], "some_string", "float:4.0", "int:1", "/some_union_string_directory")')
 
     @describe("#all_options_present")
     def _():

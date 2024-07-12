@@ -9,6 +9,10 @@ from agile_ai.utilities.option import Option
 WarehouseObjectAlias = "agile_ai.memoization.warehouse_object.WarehouseObject"
 
 
+class ExcludedKey:
+    pass
+
+
 def compute_md5_hex(values):
     md5_hash = md5()
     for value in values:
@@ -119,6 +123,7 @@ class KeyTuple(KeyPart):
             return False
         return self.to_storage() == other.to_storage()
 
+
 def _standardize_key_part(key_part: Union[KeyPart, str]) -> KeyPart:
     if isinstance(key_part, str):
         return KeyLiteral(key_part)
@@ -137,13 +142,15 @@ WarehouseObjectT = TypeVar("WarehouseObjectT", bound=WarehouseObjectAlias)
 
 T = TypeVar("T")
 
+
 class ObjectKey(Generic[WarehouseObjectT], KeyPart):
     object_cls: Type[WarehouseObjectAlias]
     key_part: KeyPart
     object_cls_name: str
     partition_name: Optional[str]
 
-    def __init__(self, object_cls: Type[WarehouseObjectAlias], key_part: KeyPart, object_cls_name=None, partition_name: Optional[str]=None):
+    def __init__(self, object_cls: Type[WarehouseObjectAlias], key_part: KeyPart, object_cls_name=None,
+                 partition_name: Optional[str] = None):
         self.object_cls = object_cls
         if not object_cls_name:
             object_cls_name = Introspection.get_class_name(object_cls)
@@ -162,7 +169,6 @@ class ObjectKey(Generic[WarehouseObjectT], KeyPart):
         if key_part:
             key_copy.key_part = key_part
         return key_copy
-
 
     def get_storage_string(self):
         return self.get_key_tuple().get_storage_string()

@@ -1,3 +1,4 @@
+import typing
 
 
 class Introspection:
@@ -54,6 +55,15 @@ class Introspection:
             return StreamOption
         if "ObjectOption" in cls_str:
             return ObjectOption
+
+    @staticmethod
+    def is_union(cls_type):
+        return "Union" in str(cls_type)
+
+    @staticmethod
+    def get_union_types(cls_type):
+        union_types = typing.get_args(cls_type)
+        return union_types
 
 
 

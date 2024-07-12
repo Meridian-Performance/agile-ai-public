@@ -1,0 +1,14 @@
+Host github.com-meridian-ml
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/meridian_ml_github_runner
+
+Host github.com-pyne
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/pyne_github_runner
+
+Host github.com-agile-ai
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/agile_ai_github_runner

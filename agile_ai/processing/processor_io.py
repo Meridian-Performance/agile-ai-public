@@ -1,6 +1,6 @@
 from typing import Type, Optional, TypeVar
 
-from agile_ai.memoization.warehouse_key import KeyTuple, KeyLiteral, ObjectKey, KeyPart
+from agile_ai.memoization.warehouse_key import KeyTuple, KeyLiteral, ObjectKey, KeyPart, ExcludedKey
 from agile_ai.utilities.introspection import Introspection
 
 T = TypeVar("T")
@@ -62,8 +62,18 @@ class IO(ObjectWithOptions):
                 key = key_value
             elif Introspection.is_object_option(key_value):
                 key = key_value.object_key
+            elif Introspection.is_union(key_type):
+                union_types = Introspection.get_union_types(key_type)
+                if ExcludedKey in union_types:
+                    continue
+                if str in union_types:
+                    key = KeyLiteral(str(key_value))
+                else:
+                    print(f"Warning, unhandled key_type {key_type} excluded from key list")
+                    continue
             else:
                 print(f"Warning, unhandled key_type {key_type} excluded from key list")
+                continue
             key_list.append(key)
         return KeyTuple(key_list)
 

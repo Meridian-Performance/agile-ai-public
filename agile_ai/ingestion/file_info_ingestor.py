@@ -1,10 +1,12 @@
-from typing import List, Callable, Dict, Tuple
+from typing import List, Callable, Dict, Tuple, Optional, Union
 
 from agile_ai.configuration.ingestion_configuration import IngestionConfiguration
+from agile_ai.data_marshalling.directory_path import DirectoryPath
+from agile_ai.data_marshalling.file_path import FilePath
 from agile_ai.injection import Marker
 from agile_ai.memoization.md5_helper import Md5Helper
 from agile_ai.memoization.object_option import ObjectOption
-from agile_ai.memoization.warehouse_key import KeyLiteral
+from agile_ai.memoization.warehouse_key import KeyLiteral, ExcludedKey
 from agile_ai.models.file_info import FileInfo
 from agile_ai.processing.processor import Processor
 from agile_ai.processing.processor_io import IO
@@ -16,7 +18,9 @@ class FileInfoIngestor(Processor):
     ingestion_configuration: IngestionConfiguration
 
     class Inputs(IO):
+        base_directory: Union[str, DirectoryPath, ExcludedKey] = None
         file_name: str
+        key_value_string: str = ""
 
     class Outputs(IO):
         file_info: ObjectOption[FileInfo]
@@ -30,11 +34,12 @@ class FileInfoIngestor(Processor):
         values may be a dot-seperated list
         """
         file_base_name = inputs.file_name.split("/")[-1]
-        extension, key_value_dict = self.parse_key_values(file_base_name)
+        base_directory = inputs.base_directory if inputs.base_directory else self.ingestion_configuration.source_data_directory
+        file_path = DirectoryPath(base_directory) // inputs.file_name
+        extension, key_value_dict = self.parse_key_values(file_base_name, inputs.key_value_string)
         if "md5" in key_value_dict:
             md5_hex = "".join(key_value_dict["md5"])
         else:
-            file_path = self.ingestion_configuration.source_data_directory // inputs.file_name
             md5_hex = self.md5_helper.digest_file(file_path)
         key_part = KeyLiteral(md5_hex)
         file_info = FileInfo().with_key_part(key_part)
@@ -45,13 +50,15 @@ class FileInfoIngestor(Processor):
         file_info.tags = key_value_dict.get("tags", [])
         outputs.file_info(file_info)
 
-    def parse_key_values(self, file_name: str) -> Tuple[str, Dict[str, List[str]]]:
+    def parse_key_values(self, file_name: str, key_values_string: str) -> Tuple[str, Dict[str, List[str]]]:
         key_value_dict = dict(name="")
         parts = file_name.split(".")
-        extension = parts[-1].lower()
-        parts = parts[:-1]
+        extension = parts.pop(-1).lower()
         value_parts = []
-        key = "name"
+        key_value_dict["name"] = parts.pop(0)
+        if key_values_string:
+            parts = key_values_string.split(".")
+        key = None
         for part in parts:
             if ":" in part:
                 if value_parts:
