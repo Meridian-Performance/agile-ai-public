@@ -2,7 +2,9 @@
 BASE_DIR=$(dirname $(dirname $0))
 cd $BASE_DIR
 
-echo 
+cp -n ssh_config ~/.ssh/config
+
+echo
 echo "******************************************************"
 echo "Initalizing submodule directory " 
 echo "******************************************************"
@@ -10,7 +12,7 @@ echo
 
 mkdir -p libraries
 mkdir -p repos
-git submodule add ssh://git@github.com/Meridian-Performance/agile-ai-pyne repos/pynetest
+git submodule add ssh://git@github.com-pyne/Meridian-Performance/agile-ai-pyne repos/pynetest
 git submodule update --init
 echo
 echo "******************************************************************"
