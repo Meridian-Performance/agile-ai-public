@@ -220,6 +220,7 @@ class ObjectKey(Generic[WarehouseObjectT], KeyPart):
         return repr(self)
 
 
+
 class StorageKey(KeyPart):
     def __init__(self, md5_hex: str):
         self.md5_hex = md5_hex
@@ -244,3 +245,10 @@ class StorageKey(KeyPart):
 
     def __str__(self):
         return repr(self)
+
+
+class StorageObjectKey(ObjectKey):
+    @classmethod
+    def from_storage(cls, value: Union[str, List]):
+        object_key = ObjectKey.from_storage(value)
+        return ObjectKey(object_key.object_cls, object_cls_name=object_key.object_cls_name, key_part=StorageKey(object_key.key_part.literal))
