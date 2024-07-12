@@ -1,12 +1,13 @@
 from typing import Type, Optional, TypeVar
 
 from agile_ai.memoization.warehouse_key import KeyTuple, KeyLiteral, ObjectKey, KeyPart, ExcludedKey
+from agile_ai.processing.typed_scope import TypedScope
 from agile_ai.utilities.introspection import Introspection
 
 T = TypeVar("T")
 
 
-class ObjectWithOptions:
+class ObjectWithOptions(TypedScope):
     def get_items(self):
         for field_name, key_type in Introspection.get_annotation_items(self):
             key_value = getattr(self, field_name)

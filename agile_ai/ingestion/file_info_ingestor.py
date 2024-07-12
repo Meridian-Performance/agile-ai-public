@@ -10,6 +10,7 @@ from agile_ai.memoization.warehouse_key import KeyLiteral, ExcludedKey
 from agile_ai.models.file_info import FileInfo
 from agile_ai.processing.processor import Processor
 from agile_ai.processing.processor_io import IO
+from agile_ai.processing.typed_scope import TypedScope
 
 
 class FileInfoIngestor(Processor):
@@ -71,6 +72,3 @@ class FileInfoIngestor(Processor):
                 value_parts.append(part)
         key_value_dict[key] = value_parts
         return extension, key_value_dict
-
-
-
