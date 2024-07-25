@@ -43,8 +43,11 @@ class FilePath(PathLike):
 def add_handlers():
     from agile_ai.data_marshalling.txt_handler import TxtHandler
     FilePath.add_handler(TxtHandler)
-    from agile_ai.data_marshalling.obj_handler import ObjHandler
-    FilePath.add_handler(ObjHandler)
+    try:
+        from agile_ai.data_marshalling.obj_handler import ObjHandler
+        FilePath.add_handler(ObjHandler)
+    except ModuleNotFoundError as e:
+        print("Unable to import ObjHandler:", e)
     from agile_ai.data_marshalling.pkl_handler import PklHandler
     FilePath.add_handler(PklHandler)
     try:
