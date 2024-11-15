@@ -169,7 +169,7 @@ def ensure_similarity_transform(similarity):
 
 def apply(*args):
     args = args[::-1]
-    result = M(args[0])
+    result = (args[0])
     args = args[1:]
     try:
         for arg in args:

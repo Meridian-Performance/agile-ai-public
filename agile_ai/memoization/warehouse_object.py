@@ -1,9 +1,9 @@
-from typing import TypeVar, Optional
+from typing import TypeVar, Optional, Type
 
 from agile_ai.data_marshalling.directory_path import DirectoryPath
 from agile_ai.data_marshalling.file_path import FilePath
 from agile_ai.injection.decorators import get_service
-from agile_ai.memoization.warehouse_key import ObjectKey, KeyPart
+from agile_ai.memoization.warehouse_key import ObjectKey, KeyPart, StorageKey
 from agile_ai.processing.processor_io import ObjectWithOptions
 from agile_ai.utilities.introspection import Introspection
 
@@ -12,12 +12,20 @@ WarehouseObjectT = TypeVar("WarehouseObjectT", bound="WarehouseObject")
 
 class WarehouseObject(ObjectWithOptions):
 
+    @classmethod
+    def from_warehouse_location(cls: Type[WarehouseObjectT], partition_name: str, storage_key: str) -> WarehouseObjectT:
+        return cls().with_partition_name(partition_name).with_storage_key_string(storage_key)
+
     def set_key_part(self, key_part: KeyPart):
         self.object_key.key_part = key_part
         return self
 
     def with_key_part(self, key_part: KeyPart):
         self.set_key_part(key_part)
+        return self
+
+    def with_storage_key_string(self, storage_key: str):
+        self.set_key_part(StorageKey.from_storage(storage_key))
         return self
 
     def with_partition_name(self, partition_name: str):
@@ -62,7 +70,7 @@ class WarehouseObject(ObjectWithOptions):
         return self.object_key.with_partition_name(partition_name)
 
     @classmethod
-    def load(cls: WarehouseObjectT, object_key: ObjectKey):
+    def load(cls: Type[WarehouseObjectT], object_key: ObjectKey):
         class_instance: WarehouseObjectT = cls(object_key.key_part, object_key.partition_name)
         directory_path = class_instance.get_object_path()
         metadata_dict = (directory_path // "metadata.json").get()
@@ -81,6 +89,7 @@ class WarehouseObject(ObjectWithOptions):
         directory_path.ensure_exists()
         (directory_path // "metadata.json").put(metadata_dict)
         self.store(directory_path)
+
     def get_object_attribute_names(self):
         cls = self.get_class()
         marker_groups = Introspection.get_marker_groups(cls)
@@ -114,7 +123,7 @@ class WarehouseObject(ObjectWithOptions):
         from agile_ai.memoization.warehouse_service import WarehouseService
         warehouse_service = get_service(WarehouseService)
         if object_key is None:
-           object_key = self.get_object_key()
+            object_key = self.get_object_key()
         return warehouse_service.get_object_path(object_key)
 
     def fetch(self, directory_path):
@@ -131,6 +140,10 @@ class WarehouseObject(ObjectWithOptions):
         from agile_ai.memoization.object_option import ObjectOption
         ObjectOption(self).put()
         return self
+
+    def get(self: WarehouseObjectT) -> WarehouseObjectT:
+        from agile_ai.memoization.object_option import ObjectOption
+        return ObjectOption(self).get()
 
     def configure(self, **kwargs):
         pass
