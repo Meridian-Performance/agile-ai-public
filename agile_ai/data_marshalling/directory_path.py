@@ -28,6 +28,17 @@ class DirectoryPath(PathLike):
             path = Path(path)
         self.path = path
 
+    def sub_directories(self):
+        for sub_directory in self.path.iterdir():
+            if sub_directory.is_dir():
+                yield DirectoryPath(sub_directory)
+
+    def files(self):
+        from agile_ai.data_marshalling.file_path import FilePath
+        for file in self.path.iterdir():
+            if file.is_file():
+                yield FilePath(file)
+
     def ensure_exists(self):
         self.path.mkdir(parents=True, exist_ok=True)
 
