@@ -29,7 +29,12 @@ class FilePath(PathLike):
             pass
 
     def get(self):
-        return self._handler.load(self.path)
+        try:
+            return self._handler.load(self.path)
+        except Exception as e:
+            print("Error loading", self.path)
+            print(e)
+            raise e
 
     def put(self, object):
         DirectoryPath(self.path.parent).ensure_exists()

@@ -1,9 +1,10 @@
 from agile_ai.injection.decorators import Marker
-from agile_ai.utilities.lazy_option import LazyOption
+from agile_ai.utilities.memo_option import MemoOption
 from agile_ai_tests.test_helpers.pyne_test_helpers import before_each, describe, it, TCBase
 from agile_ai_tests.test_helpers.test_helpers import reset_and_configure_test
 from pynetest.expectations import expect
 from pynetest.pyne_tester import pyne
+from pynetest.test_doubles.spy import Spy
 from pynetest.test_doubles.stub import MegaStub
 
 
@@ -14,17 +15,20 @@ class TestContext(TCBase):
     stubs: MegaStub
 
     __other__: Marker
-    empty_option: LazyOption
-    present_option: LazyOption
+    spy: Spy
+    empty_option: MemoOption
+    present_option: MemoOption
 
 
 @pyne
-def lazy_option_test():
+def memo_option_test():
     @before_each(TestContext)
     def _(tc: TestContext):
         reset_and_configure_test()
-        tc.empty_option = LazyOption.empty()
-        tc.present_option = LazyOption(lambda: 0)
+        tc.empty_option = MemoOption.empty()
+        tc.spy = Spy()
+        tc.spy.then_return(0)
+        tc.present_option = MemoOption(tc.spy)
 
     @describe("#is_present")
     def _():
@@ -64,6 +68,17 @@ def lazy_option_test():
 
         @describe("when it is an present option")
         def _():
-            @it("returns the result of the function")
-            def _(tc: TestContext):
-                expect(tc.present_option.get()).to_be(0)
+            @describe("when it is called for the first time")
+            def _():
+                @it("returns the result of the function")
+                def _(tc: TestContext):
+                    expect(tc.present_option.get()).to_be(0)
+                    expect(tc.spy).was_called()
+
+            @describe("when it is called for the second time")
+            def _():
+                @it("returns the result of the function, only calling it once")
+                def _(tc: TestContext):
+                    expect(tc.present_option.get()).to_be(0)
+                    expect(tc.present_option.get()).to_be(0)
+                    expect(tc.spy.calls).to_have_length(1)
