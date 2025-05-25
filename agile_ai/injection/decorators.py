@@ -21,6 +21,7 @@ def autowire_services(cls):
         from agile_ai.injection.interfaces import Service
         if Introspection.is_subclass(service_cls, Service):
             setattr(cls, service_name, autowire(service_cls))
+    return cls
 
 
 autowire_context = AutowireContext()
@@ -30,3 +31,8 @@ ServiceT = TypeVar("ServiceT", bound=Service)
 
 def get_service(service_cls: Type[ServiceT]) -> ServiceT:
     return autowire_context.get_service(service_cls)
+
+
+def inject(instance, for_cls=None):
+    autowire_context.inject(instance, for_cls)
+    return instance
