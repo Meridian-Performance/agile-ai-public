@@ -13,8 +13,8 @@ class VideoWriter:
         self.output_path = output_path
         self.frame_source = frame_source
 
-    def write(self):
+    def write(self, rate=30):
         input_path = self.frame_source.get_input_path()
         output_path = self.output_path
-        command = f"ffmpeg -r 30 -f image2 -i {input_path} -vcodec libx264 -crf 25 -pix_fmt yuv420p {output_path}"
+        command = f"ffmpeg -r {rate} -f image2 -i {input_path} -vcodec libx264 -crf 25 -pix_fmt yuv420p {output_path}"
         os.system(command)
