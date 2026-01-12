@@ -196,7 +196,7 @@ def apply(*args):
                 elif arg == "H":  # Create homography, drop the z column and remove the last row
                     result = result[:3, [0, 1, 3]].copy()
             else:
-                result = np.dot(M(arg), result)
+                result = np.dot(arg, result)
     except ValueError as e:
         logging.error(arg, exc_info=e)
         logging.error(result)
