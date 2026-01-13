@@ -1,6 +1,6 @@
 from typing import Any
 
-from nptyping import NDArray, Float, Int, Bool, Shape
+from nptyping import NDArray, Float, Int, Bool, Shape, UInt8
 
 Float4 = NDArray[Shape["4"], Float]
 Float3 = NDArray[Shape["3"], Float]
@@ -15,7 +15,6 @@ FloatND = NDArray[Shape["Any, Any"], Float]
 IntN2 = NDArray[Shape["Any, 2"], Int]
 Int2N = NDArray[Shape["2, Any"], Int]
 FloatN = NDArray[Any, Float]
-Float2 = NDArray[Shape["2"], Float]
 BoolN = NDArray[Any, Bool]
 IntN = NDArray[Any, Int]
 Int2 = NDArray[Shape["2"], Int]
@@ -23,9 +22,12 @@ Int3 = NDArray[Shape["3"], Int]
 Float2D = NDArray[Shape["Any, Any"], Float]
 Int2D = NDArray[Shape["Any, Any"], Float]
 Bool2D = NDArray[Shape["Any, Any"], Float]
+UInt82D3 = NDArray[Shape["Any, Any, 3"], UInt8]
+UInt82D = NDArray[Shape["Any, Any"], UInt8]
+UInt8N3 = NDArray[Shape["Any, 3"], UInt8]
 
 Float2x2 = NDArray[Shape["2, 2"], Float]
 Float3x3 = NDArray[Shape["3, 3"], Float]
 Float3D = NDArray[Shape["Any, Any, Any"], Float]
-Int3D = NDArray[Shape["Any, Any, Any"], Float]
-Bool3D = NDArray[Shape["Any, Any, Any"], Float]
+Int3D = NDArray[Shape["Any, Any, Any"], Int]
+Bool3D = NDArray[Shape["Any, Any, Any"], Bool]
