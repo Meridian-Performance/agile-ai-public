@@ -10,7 +10,6 @@ future = "*"
 termcolor = "*"
 moderngl = "5.6.4"
 Cython = "*"
-nptyping = "*" 
 scipy = "*"
 click-completion = "*"
 matplotlib = "*"
@@ -28,7 +27,7 @@ pyarrow = "*"
 [dev-packages]
 
 [requires]
-python_version = "3.9"
+python_version = "3.13"
 
 [scripts]
 setup = "./scripts/setup.py"

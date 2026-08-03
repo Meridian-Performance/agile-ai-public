@@ -1,33 +1,40 @@
 from typing import Any
+from typing import Any, Literal
+import numpy as np
+import numpy.typing as npt
 
-from nptyping import NDArray, Float, Int, Bool, Shape, UInt8
+# --- Base NDArray Types by Precision/Dtype ---
+# Note: npt.NDArray[np.float64] typed with tuple shapes works with modern static type checkers.
 
-Float4 = NDArray[Shape["4"], Float]
-Float3 = NDArray[Shape["3"], Float]
-Float2 = NDArray[Shape["2"], Float]
-Float3N = NDArray[Shape["3, Any"], Float]
-Float33 = NDArray[Shape["3, 3"], Float]
-Float44 = NDArray[Shape["4, 4"], Float]
-Float2N = NDArray[Shape["2, Any"], Float]
-FloatN3 = NDArray[Shape["Any, 3"], Float]
-FloatN2 = NDArray[Shape["Any, 2"], Float]
-FloatND = NDArray[Shape["Any, Any"], Float]
-IntN2 = NDArray[Shape["Any, 2"], Int]
-Int2N = NDArray[Shape["2, Any"], Int]
-FloatN = NDArray[Any, Float]
-BoolN = NDArray[Any, Bool]
-IntN = NDArray[Any, Int]
-Int2 = NDArray[Shape["2"], Int]
-Int3 = NDArray[Shape["3"], Int]
-Float2D = NDArray[Shape["Any, Any"], Float]
-Int2D = NDArray[Shape["Any, Any"], Float]
-Bool2D = NDArray[Shape["Any, Any"], Float]
-UInt82D3 = NDArray[Shape["Any, Any, 3"], UInt8]
-UInt82D = NDArray[Shape["Any, Any"], UInt8]
-UInt8N3 = NDArray[Shape["Any, 3"], UInt8]
+# 1D fixed shapes
+Float4 = np.ndarray[tuple[Literal[4]], np.dtype[np.float64]]
+Float3 = np.ndarray[tuple[Literal[3]], np.dtype[np.float64]]
+Float2 = np.ndarray[tuple[Literal[2]], np.dtype[np.float64]]
+Int3 = np.ndarray[tuple[Literal[3]], np.dtype[np.int64]]
 
-Float2x2 = NDArray[Shape["2, 2"], Float]
-Float3x3 = NDArray[Shape["3, 3"], Float]
-Float3D = NDArray[Shape["Any, Any, Any"], Float]
-Int3D = NDArray[Shape["Any, Any, Any"], Int]
-Bool3D = NDArray[Shape["Any, Any, Any"], Bool]
+# Fixed 2D shapes
+Float33 = np.ndarray[tuple[Literal[3], Literal[3]], np.dtype[np.float64]]
+Float44 = np.ndarray[tuple[Literal[4], Literal[4]], np.dtype[np.float64]]
+
+# Dynamic 1D arrays (Unspecified size)
+FloatN = npt.NDArray[np.float64]
+IntN = npt.NDArray[np.int64]
+BoolN = npt.NDArray[np.bool_]
+
+# Dynamic 2D arrays with specific fixed dimension counts
+Float3N = np.ndarray[tuple[Literal[3], Any], np.dtype[np.float64]]
+Float2N = np.ndarray[tuple[Literal[2], Any], np.dtype[np.float64]]
+FloatN3 = np.ndarray[tuple[Any, Literal[3]], np.dtype[np.float64]]
+FloatN2 = np.ndarray[tuple[Any, Literal[2]], np.dtype[np.float64]]
+IntN2 = np.ndarray[tuple[Any, Literal[2]], np.dtype[np.int64]]
+
+# Explicit 2D general shapes
+Float2D = np.ndarray[tuple[Any, Any], np.dtype[np.float64]]
+Int2D = np.ndarray[tuple[Any, Any], np.dtype[np.int64]]
+Bool2D = np.ndarray[tuple[Any, Any], np.dtype[np.bool_]]
+FloatND = Float2D  # Alias matching your original script
+
+# Explicit 3D general shapes
+Float3D = np.ndarray[tuple[Any, Any, Any], np.dtype[np.float64]]
+Int3D = np.ndarray[tuple[Any, Any, Any], np.dtype[np.int64]]
+Bool3D = np.ndarray[tuple[Any, Any, Any], np.dtype[np.bool_]]
